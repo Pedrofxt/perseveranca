@@ -1,7 +1,7 @@
 // Conexão com o Supabase (chave pública: pode ficar no site; a proteção vem das regras RLS do banco)
 window.PV_CONFIG = {
-  supabaseUrl: "",   // preenchido quando o projeto do Supabase for criado
-  supabaseKey: "",
+  supabaseUrl: "https://ufuhgrpldbqzywsnuppt.supabase.co",
+  supabaseKey: "sb_publishable_2n-A-D1mnEU3WL7JS70OTg_tVig47HT",
   frequenciaMinima: 75,
   escola: {
     nome: "Centro de Educação Infantil Perseverança",
