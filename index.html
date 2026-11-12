@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CEI Perseverança</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Centro de Educação Infantil Perseverança — 50 anos de educação infantil sem fins lucrativos em Paranaguá-PR.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&family=Patrick+Hand&display=swap">
+<link rel="stylesheet" href="assets/pv.css">
+<style>
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--surface)}
+/* barra de progresso: um cipó que cresce com a rolagem */
+.vine{position:fixed;left:0;top:env(safe-area-inset-top,0px);height:5px;width:100%;z-index:70;transform-origin:left;transform:scaleX(var(--p,0));background:linear-gradient(90deg,var(--leaf),var(--sun),var(--coral));border-radius:0 6px 6px 0}
+
+.top{background:var(--leaf-deep);color:#fff;font-size:13.5px}
+.top .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;padding-block:7px}
+.top a{color:#fff;font-weight:800;text-decoration:none}
+.top a:hover{text-decoration:underline}
+header.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header.nav .wrap{display:flex;align-items:center;gap:10px;padding-block:10px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);margin-right:auto}
+.logo img{width:50px;transition:transform .6s cubic-bezier(.3,1.7,.5,1)}
+.logo:hover img{transform:rotate(-14deg) scale(1.08)}
+.logo b{display:block;font-family:var(--f-display);font-size:21px;font-weight:600;line-height:1}
+.logo small{display:block;font-family:var(--f-hand);font-size:16px;color:var(--muted);margin-top:2px}
+nav.menu ul{list-style:none;margin:0;padding:0;display:flex;align-items:center;gap:2px}
+nav.menu a{display:block;padding:9px 11px;border-radius:12px;text-decoration:none;font-weight:800;font-size:15px;color:var(--ink);position:relative}
+nav.menu a::after{content:"";position:absolute;left:11px;right:11px;bottom:3px;height:4px;border-radius:4px;background:var(--sun);transform:scaleX(0);transform-origin:left;transition:transform .3s cubic-bezier(.3,1.5,.5,1)}
+nav.menu a:hover::after{transform:scaleX(1)}
+.nav-actions{display:flex;gap:8px;align-items:center}
+.burger{display:none;width:44px;height:42px;border-radius:14px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.burger span{display:block;width:20px;height:2.5px;background:currentColor;margin:4px auto;border-radius:2px;transition:transform .25s,opacity .2s}
+.burger[aria-expanded="true"] span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+.mob-only{display:none}
+@media (max-width:1120px){
+  .burger{display:block}
+  nav.menu{position:absolute;left:0;right:0;top:100%;background:var(--surface);border-bottom:1px solid var(--line);padding:10px max(18px,env(safe-area-inset-right,0px)) 18px max(18px,env(safe-area-inset-left,0px));animation:drop .3s cubic-bezier(.3,1.4,.6,1)}
+  nav.menu ul{flex-direction:column;align-items:stretch}
+  nav.menu .mob-only{display:block}
+  .nav-actions .btn{display:none}
+}
+@media (max-width:480px){.logo small{display:none}.logo b{font-size:16px;line-height:1.05}.logo img{width:42px}.logo{min-width:0}.nav-actions{gap:5px}.nav-actions .icon-toggle{width:38px;height:38px}.burger{width:40px}}
+@keyframes drop{from{transform:translateY(-10px);opacity:.3}to{transform:none;opacity:1}}
+
+/* ===== HERO imersivo: céu, sol, nuvens, mar e bolhas que estouram ===== */
+.hero{position:relative;overflow:hidden;isolation:isolate;background:linear-gradient(180deg,#7FD0F5 0%,#BFE9FB 55%,#E6F7FF 100%);color:#0F3A26}
+:root[data-theme="dark"] .hero{background:linear-gradient(180deg,#0C2A4A 0%,#123B5E 60%,#17486B 100%);color:#EAF7FF}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .hero{background:linear-gradient(180deg,#0C2A4A 0%,#123B5E 60%,#17486B 100%);color:#EAF7FF}}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;cursor:pointer}
+.layer{position:absolute;pointer-events:none;transition:transform .25s ease-out;will-change:transform}
+.sun{right:8%;top:40px;width:clamp(120px,16vw,200px);aspect-ratio:1;z-index:0}
+.sun .disc{position:absolute;inset:22%;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFE38A,#FFC233 60%,#F5A800);box-shadow:0 0 60px 20px rgba(255,194,51,.45)}
+.sun .rays{position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(from 0deg,rgba(255,194,51,.85) 0 6deg,transparent 6deg 30deg);mask:radial-gradient(circle,transparent 42%,#000 43%,#000 70%,transparent 71%);-webkit-mask:radial-gradient(circle,transparent 42%,#000 43%,#000 70%,transparent 71%);animation:spin 30s linear infinite}
+:root[data-theme="dark"] .sun .disc{background:radial-gradient(circle at 35% 35%,#FFFBEA,#F2F0D8 60%,#D8D3B0);box-shadow:0 0 50px 14px rgba(255,251,220,.25)}
+:root[data-theme="dark"] .sun .rays{opacity:0}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .sun .disc{background:radial-gradient(circle at 35% 35%,#FFFBEA,#F2F0D8 60%,#D8D3B0);box-shadow:0 0 50px 14px rgba(255,251,220,.25)}:root:not([data-theme="light"]) .sun .rays{opacity:0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.cloud{position:absolute;background:#fff;border-radius:999px;opacity:.9;z-index:0;animation:drift linear infinite}
+.cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
+.cloud::before{width:55%;height:180%;left:12%;bottom:20%}
+.cloud::after{width:40%;height:140%;right:14%;bottom:25%}
+:root[data-theme="dark"] .cloud,:root[data-theme="dark"] .cloud::before,:root[data-theme="dark"] .cloud::after{background:#2B5579}
+.c1{width:150px;height:36px;top:70px;left:-160px;animation-duration:46s}
+.c2{width:110px;height:28px;top:170px;left:-120px;animation-duration:62s;animation-delay:-20s}
+.c3{width:190px;height:44px;top:30px;left:-200px;animation-duration:80s;animation-delay:-50s}
+@keyframes drift{to{transform:translateX(calc(100vw + 260px))}}
+.sea{position:absolute;left:0;right:0;bottom:0;height:140px;z-index:2;pointer-events:auto;cursor:pointer}
+.sea svg{position:absolute;left:0;bottom:0;width:200%;height:100%}
+.sea .w1{animation:wave 12s linear infinite}.sea .w2{animation:wave 8s linear infinite reverse;opacity:.85}.sea .w3{animation:wave 16s linear infinite}
+@keyframes wave{to{transform:translateX(-50%)}}
+.hero .wrap{position:relative;z-index:3;display:grid;grid-template-columns:1.25fr .8fr;gap:30px;align-items:center;padding-block:64px 170px;pointer-events:none}
+.hero .wrap a,.hero .wrap button{pointer-events:auto}
+.hero .kicker{display:inline-flex;align-items:center;gap:8px;background:var(--surface);color:var(--ink);font-weight:800;font-size:14px;padding:7px 14px 7px 8px;border-radius:999px;box-shadow:0 6px 16px -8px rgba(0,0,0,.25);animation:rise .7s both}
+.hero .kicker b{background:var(--coral);color:#fff;border-radius:999px;padding:3px 9px}
+.hero h1{font-size:clamp(40px,6.4vw,80px);font-weight:700;letter-spacing:-.01em;margin:18px 0 18px;line-height:1.02}
+.hero h1 .w{display:inline-block;animation:rise .8s cubic-bezier(.2,1.5,.4,1) both}
+.hero h1 .w:nth-child(2){animation-delay:.07s}.hero h1 .w:nth-child(3){animation-delay:.14s}.hero h1 .w:nth-child(4){animation-delay:.21s}.hero h1 .w:nth-child(5){animation-delay:.28s}.hero h1 .w:nth-child(6){animation-delay:.35s}.hero h1 .w:nth-child(7){animation-delay:.42s}
+.hero h1 .hl{color:var(--leaf);position:relative}
+:root[data-theme="dark"] .hero h1 .hl{color:#8FE3B5}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .hero h1 .hl{color:#8FE3B5}}
+.hero h1 .hl svg{position:absolute;left:-2%;right:0;bottom:-8px;width:104%;height:16px;overflow:visible}
+.hero h1 .hl path{stroke:var(--coral);stroke-width:6;fill:none;stroke-linecap:round;stroke-dasharray:320;animation:draw 1.2s .8s ease both}
+@keyframes draw{from{stroke-dashoffset:320}to{stroke-dashoffset:0}}
+@keyframes rise{from{transform:translateY(40%) rotate(4deg);opacity:0}to{transform:none;opacity:1}}
+.hero p.lead{font-size:clamp(17px,1.7vw,20px);max-width:50ch;animation:rise .8s .5s both;font-weight:600}
+.hero .actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:28px;animation:rise .8s .6s both}
+.hero .btn-ghost{color:inherit;background:color-mix(in srgb,var(--surface) 60%,transparent)}
+.hint-pop{margin-top:18px;font-family:var(--f-hand);font-size:19px;opacity:.85;display:flex;align-items:center;gap:8px;animation:rise .8s .8s both}
+.hint-pop i{display:inline-block;animation:wiggle 1.4s ease-in-out infinite;font-style:normal}
+.badge50{justify-self:center;width:min(300px,80%);aspect-ratio:1;position:relative;display:grid;place-items:center;animation:crestIn 1s .2s cubic-bezier(.2,1.5,.4,1) both}
+.badge50 .ring{position:absolute;inset:0;border-radius:50%;background:var(--surface);box-shadow:0 30px 50px -20px rgba(15,58,38,.45);border:8px dashed var(--sun)}
+.badge50 .ring::after{content:"";position:absolute;inset:14px;border-radius:50%;border:3px solid var(--leaf)}
+.badge50 .txt{position:relative;text-align:center;color:var(--ink);line-height:1}
+.badge50 .num{font-family:var(--f-display);font-weight:700;font-size:clamp(84px,11vw,124px);color:var(--leaf);display:block;font-variant-numeric:tabular-nums}
+.badge50 .sub{font-family:var(--f-hand);font-size:24px;display:block;margin-top:-6px}
+.badge50 .orbit{position:absolute;inset:-18px;animation:spin 18s linear infinite}
+.badge50 .orbit span{position:absolute;width:26px;height:26px;border-radius:50%}
+@keyframes crestIn{from{transform:scale(.5) rotate(-20deg);opacity:0}to{transform:none;opacity:1}}
+@media (max-width:880px){.hero .wrap{grid-template-columns:1fr;padding-block:40px 160px}.badge50{order:-1;width:190px}.badge50 .num{font-size:74px}.badge50 .sub{font-size:18px}}
+
+/* faixa */
+.marquee{background:var(--sun);color:#3A2A00;overflow:hidden;border-block:3px solid var(--leaf-deep)}
+.marquee .track{display:flex;gap:30px;width:max-content;padding-block:11px;animation:marq 28s linear infinite;font-family:var(--f-display);font-weight:600;font-size:19px}
+.marquee .track span{display:flex;align-items:center;gap:30px;white-space:nowrap}
+.marquee .track span::after{content:"✿";color:var(--coral)}
+.marquee:hover .track{animation-play-state:paused}
+@keyframes marq{to{transform:translateX(-50%)}}
+
+section.block{padding-block:86px;position:relative}
+.head{display:grid;gap:10px;margin-bottom:38px;max-width:760px}
+.head .label{color:var(--coral)}
+.head h2{font-size:clamp(32px,4.4vw,54px);font-weight:700}
+.head p{color:var(--muted);font-size:18px}
+@supports (animation-timeline: view()){
+  .reveal{animation:revealUp linear both;animation-timeline:view();animation-range:entry 0% entry 38%}
+  @keyframes revealUp{from{opacity:.15;transform:translateY(50px) scale(.96) rotate(-1deg)}to{opacity:1;transform:none}}
+}
+.alt{background:var(--surface);border-block:1px solid var(--line)}
+.squiggle{position:absolute;left:0;right:0;top:-1px;height:24px;color:var(--bg)}
+
+/* sobre */
+.about{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+.about>div{min-width:0}
+.about .txt{display:grid;gap:16px;color:var(--muted);font-size:17.5px}
+.about .txt strong{color:var(--ink)}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+.fact{background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:16px;display:grid;gap:4px;transition:transform .3s cubic-bezier(.3,1.6,.5,1),border-color .2s}
+.fact:hover{transform:translateY(-4px) rotate(-1deg);border-color:var(--leaf)}
+.fact b{font-family:var(--f-display);font-size:30px;font-weight:700;color:var(--leaf);line-height:1}
+.fact small{color:var(--muted);font-weight:700}
+.drawing{position:relative;aspect-ratio:1;max-width:440px;width:100%;margin-inline:auto}
+.drawing svg{width:100%;height:auto;display:block}
+.drawing .bob{animation:float 4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@media (max-width:900px){.about{grid-template-columns:1fr}}
+
+/* pilares */
+.pillars{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.pillar{border-radius:26px;padding:26px 22px;display:grid;gap:12px;align-content:start;position:relative;overflow:hidden;transition:transform .35s cubic-bezier(.3,1.6,.5,1);cursor:default;min-height:290px}
+.pillar:hover{transform:translateY(-8px) rotate(-1.2deg)}
+.pillar:nth-child(even):hover{transform:translateY(-8px) rotate(1.2deg)}
+.pillar .ic{width:64px;height:64px;border-radius:20px;display:grid;place-items:center;background:rgba(255,255,255,.25)}
+.pillar:hover .ic{animation:wiggle .6s ease}
+.pillar .ic svg{width:34px;height:34px}
+.pillar h3{font-size:24px}
+.pillar p{font-size:15.5px;opacity:.95}
+.pillar .n{position:absolute;right:14px;bottom:-14px;font-family:var(--f-display);font-weight:700;font-size:110px;opacity:.14;line-height:1}
+.p1{background:var(--leaf);color:#fff}.p2{background:var(--sea);color:#fff}.p3{background:var(--sun);color:#3A2A00}.p4{background:var(--coral);color:#fff}
+.socio{margin-top:16px;display:flex;gap:14px;align-items:center;background:var(--surface);border:2px dashed var(--berry);border-radius:20px;padding:16px 20px}
+.socio b{font-family:var(--f-display);font-size:20px;font-weight:600}
+@media (max-width:1000px){.pillars{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.pillars{grid-template-columns:1fr}.pillar{min-height:0}}
+
+/* trilha das turmas */
+.trail{position:relative;background:var(--surface);border:2px solid var(--line);border-radius:30px;padding:26px 18px 22px;overflow:hidden}
+.trail-svg{display:block;width:100%;height:auto;overflow:visible}
+.trail-svg .path{fill:none;stroke:var(--sun);stroke-width:10;stroke-linecap:round;stroke-dasharray:18 16}
+.trail-svg .stop{cursor:pointer}
+.trail-svg .stop circle.bg{transition:transform .3s cubic-bezier(.3,1.7,.5,1);transform-box:fill-box;transform-origin:center}
+.trail-svg .stop:hover circle.bg,.trail-svg .stop:focus circle.bg{transform:scale(1.12)}
+.trail-svg .stop[aria-pressed="true"] circle.bg{stroke:var(--ink);stroke-width:5}
+.trail-svg text{font-family:var(--f-display);font-weight:600;fill:var(--ink)}
+.trail-svg .sprout{transition:transform .8s cubic-bezier(.3,1.4,.5,1)}
+.turma-info{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;margin-top:10px;background:var(--surface-2);border-radius:22px;padding:20px 22px;animation:viewIn .4s both}
+.turma-info h3{font-size:26px}
+.turma-info p{color:var(--muted)}
+.vagas{display:grid;gap:6px;min-width:180px}
+.vagas .bar{height:12px;border-radius:999px;background:var(--surface);overflow:hidden}
+.vagas .bar i{display:block;height:100%;background:var(--leaf);border-radius:999px;transition:width .8s cubic-bezier(.3,1.3,.5,1)}
+@media (max-width:700px){.turma-info{grid-template-columns:1fr}}
+
+/* avisos */
+.news{display:grid;grid-template-columns:1.3fr .9fr;gap:22px}
+.news>div{min-width:0;display:grid;gap:12px;align-content:start}
+.aviso{background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:18px 20px;display:grid;gap:6px;animation:viewIn .5s both}
+.aviso.fix{border-color:var(--coral)}
+.aviso h3{font-size:20px}
+.aviso p{color:var(--muted);white-space:pre-line}
+.ev{display:grid;grid-template-columns:64px 1fr;gap:14px;align-items:center;background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:12px;animation:viewIn .5s both}
+.ev .d{background:var(--leaf);color:#fff;border-radius:16px;text-align:center;padding:8px 0;font-family:var(--f-display);line-height:1}
+.ev .d b{display:block;font-size:26px}
+.ev .d small{font-size:12px;text-transform:uppercase;font-weight:600}
+.ev h4{font-size:17px}
+.ev p{color:var(--muted);font-size:14px}
+@media (max-width:900px){.news{grid-template-columns:1fr}}
+
+/* portais */
+.portals{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.portal{border-radius:30px;padding:30px;display:grid;gap:12px;text-decoration:none;color:#fff;position:relative;overflow:hidden;transition:transform .3s cubic-bezier(.3,1.6,.5,1)}
+.portal:hover{transform:translateY(-6px) rotate(-.8deg)}
+.portal.rp{background:var(--coral)}.portal.eq{background:var(--leaf-deep)}
+.portal h3{font-size:32px;font-weight:700}
+.portal ul{margin:0;padding-left:20px;opacity:.95;display:grid;gap:3px}
+.portal .go{display:inline-flex;align-items:center;gap:8px;font-weight:800;background:#fff;color:var(--ink);padding:11px 18px;border-radius:999px;justify-self:start;transition:gap .2s}
+.portal:hover .go{gap:14px}
+.portal .deco{position:absolute;right:-30px;top:-30px;width:170px;height:170px;border-radius:50%;background:rgba(255,255,255,.13);transition:transform .6s}
+.portal:hover .deco{transform:scale(1.3)}
+@media (max-width:760px){.portals{grid-template-columns:1fr}}
+
+/* galeria ilustrada */
+.gallery{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:180px;gap:12px}
+.ph{border-radius:22px;position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:14px;color:#fff;font-weight:800;transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
+.ph:hover{transform:scale(1.03) rotate(-1deg)}
+.ph::before{content:"";position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.2) 2px,transparent 3px) 0 0/22px 22px}
+.ph span{position:relative;background:rgba(0,0,0,.18);padding:6px 10px;border-radius:12px}
+.ph small{display:block;font-weight:600;opacity:.9;font-size:12.5px}
+.ph:nth-child(1){grid-column:span 2;grid-row:span 2;background:var(--leaf)}
+.ph:nth-child(2){background:var(--coral)}.ph:nth-child(3){background:var(--sun);color:#3A2A00}.ph:nth-child(4){grid-column:span 2;background:var(--sea)}.ph:nth-child(5){background:var(--berry)}.ph:nth-child(6){background:var(--leaf-deep)}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+@media (max-width:760px){.gallery{grid-template-columns:1fr 1fr;grid-auto-rows:140px}}
+
+/* onde estamos + contato */
+.contact{display:grid;grid-template-columns:.95fr 1.05fr;gap:24px}
+.contact>*{min-width:0}
+.info{background:var(--leaf);color:#fff;border-radius:30px;padding:30px;display:grid;gap:18px;align-content:start;position:relative;overflow:hidden}
+.info::after{content:"";position:absolute;left:-10%;right:-10%;bottom:-40px;height:110px;background:var(--sea);border-radius:50% 50% 0 0}
+.info>*{position:relative;z-index:1}
+.info dl{margin:0;display:grid;gap:14px}
+.info dt{font-family:var(--f-hand);font-size:18px;opacity:.85}
+.info dd{margin:0;font-weight:800;overflow-wrap:anywhere}
+.info a{color:#fff}
+.copy{margin-left:8px;font:800 12px/1 var(--f-body);padding:6px 10px;border-radius:999px;border:1.5px solid rgba(255,255,255,.7);background:transparent;color:#fff;cursor:pointer}
+.map-card{display:flex;gap:14px;align-items:center;background:rgba(255,255,255,.14);border-radius:18px;padding:12px;text-decoration:none}
+.map-card .pin{width:48px;height:48px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--coral);display:grid;place-items:center;flex:none;animation:bounce 1.6s ease-in-out infinite}
+.map-card .pin i{width:16px;height:16px;border-radius:50%;background:#fff}
+@keyframes bounce{0%,100%{transform:rotate(-45deg) translate(0,0)}50%{transform:rotate(-45deg) translate(4px,-4px)}}
+form.card{display:grid;gap:14px;padding:28px;border-radius:30px}
+@media (max-width:900px){.contact{grid-template-columns:1fr}}
+
+footer{background:var(--leaf-deep);color:#fff}
+footer .wrap{padding-block:46px 26px;display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:28px}
+footer h4{font-family:var(--f-hand);font-size:20px;font-weight:400;opacity:.8;margin-bottom:10px}
+footer ul{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+footer a{color:#fff;text-decoration:none;opacity:.9}
+footer a:hover{opacity:1;text-decoration:underline}
+footer .bottom{grid-column:1/-1;border-top:1px solid rgba(255,255,255,.18);padding-top:18px;font-size:13.5px;opacity:.75;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}
+@media (max-width:900px){footer .wrap{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){footer .wrap{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="vine" id="vine" aria-hidden="true"></div>
+<div class="top">
+  <div class="wrap">
+    <span>R. José Antônio Temporão, 169 · Paranaguá – PR · Seg a sex, 8h–12h e 13h–17h</span>
+    <span><b>(41) 3425-5968</b> · <a href="https://api.whatsapp.com/send?phone=554134255968" target="_blank" rel="noopener">WhatsApp</a> · <a href="https://www.instagram.com/ceiperseveranca/" target="_blank" rel="noopener">Instagram</a></span>
+  </div>
+</div>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="#inicio"><img src="assets/logo.svg" alt="Emblema do CEI Perseverança" width="50" height="50"><span><b>CEI Perseverança</b><small>50 anos em Paranaguá</small></span></a>
+    <nav class="menu" id="menu">
+      <ul>
+        <li><a href="#sobre" data-sfx-hover>Sobre</a></li>
+        <li><a href="#educar" data-sfx-hover>Como educamos</a></li>
+        <li><a href="#turmas" data-sfx-hover>Turmas</a></li>
+        <li><a href="#avisos" data-sfx-hover>Avisos</a></li>
+        <li><a href="#onde-estamos" data-sfx-hover>Onde estamos</a></li>
+        <li class="mob-only"><a href="responsavel.html">Área do Responsável</a></li>
+        <li class="mob-only"><a href="equipe.html">Área da Equipe</a></li>
+      </ul>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn btn-coral btn-sm" href="responsavel.html#matricula" data-deslogado>Solicite uma vaga</a>
+      <button class="icon-toggle sound-toggle" type="button"></button>
+      <button class="icon-toggle theme-toggle" type="button"></button>
+      <div class="acct" id="acct"></div>
+      <button class="burger" id="burger" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main id="inicio">
+<section class="hero" id="hero">
+  <div class="layer sun" data-depth="12" aria-hidden="true"><div class="rays"></div><div class="disc"></div></div>
+  <span class="cloud c1" aria-hidden="true"></span><span class="cloud c2" aria-hidden="true"></span><span class="cloud c3" aria-hidden="true"></span>
+  <canvas id="bolhas" aria-label="Bolhas coloridas: toque para estourar"></canvas>
+  <div class="wrap">
+    <div>
+      <span class="kicker"><b>50 anos</b> sem fins lucrativos · Paranaguá</span>
+      <h1><span class="w">Cuidar</span> <span class="w">de</span> <span class="w">quem</span> <span class="w">está</span> <span class="w">começando</span> <span class="w">a</span> <span class="w hl">crescer<svg viewBox="0 0 320 16" preserveAspectRatio="none" aria-hidden="true"><path d="M3 11 Q 80 2 160 9 T 317 6"/></svg></span></h1>
+      <p class="lead">O Centro de Educação Infantil Perseverança atende crianças do Berçário ao Infantil 5, com educadores qualificados, cuidado individual e as famílias sempre por perto.</p>
+      <div class="actions">
+        <a class="btn btn-leaf" href="responsavel.html#matricula">Solicite uma vaga</a>
+        <a class="btn btn-ghost" href="#turmas">Conheça as turmas</a>
+      </div>
+      <p class="hint-pop" aria-hidden="true"><i>👆</i> toque nas bolhas e no mar</p>
+    </div>
+    <div class="badge50 layer" data-depth="-10" aria-hidden="true">
+      <div class="ring"></div>
+      <div class="orbit"><span style="top:0;left:50%;background:var(--coral)"></span><span style="bottom:6%;left:8%;background:var(--sea)"></span><span style="bottom:6%;right:8%;background:var(--leaf)"></span></div>
+      <div class="txt"><span class="num" id="num50">50</span><span class="sub">anos de dedicação</span></div>
+    </div>
+  </div>
+  <div class="sea" id="mar" title="Toque no mar">
+    <svg viewBox="0 0 2880 140" preserveAspectRatio="none" aria-hidden="true">
+      <path class="w3" fill="#2E8FC4" d="M0 50 C 240 10 480 90 720 50 S 1200 10 1440 50 S 1920 90 2160 50 S 2640 10 2880 50 V140 H0Z"/>
+      <path class="w2" fill="#3BA7E0" d="M0 75 C 200 45 520 105 720 75 S 1240 45 1440 75 S 1960 105 2160 75 S 2680 45 2880 75 V140 H0Z"/>
+      <path class="w1" fill="var(--bg)" d="M0 105 C 260 85 460 125 720 105 S 1180 85 1440 105 S 1900 125 2160 105 S 2620 85 2880 105 V140 H0Z"/>
+    </svg>
+  </div>
+</section>
+
+<div class="marquee" aria-hidden="true">
+  <div class="track">
+    <span>Educação para todos</span><span>Berçário ao Infantil 5</span><span>Alimentação nutritiva</span><span>Família e escola juntas</span><span>Paranaguá – PR</span><span>50 anos</span>
+    <span>Educação para todos</span><span>Berçário ao Infantil 5</span><span>Alimentação nutritiva</span><span>Família e escola juntas</span><span>Paranaguá – PR</span><span>50 anos</span>
+  </div>
+</div>
+
+<!-- SOBRE -->
+<section class="block" id="sobre">
+  <div class="wrap about">
+    <div class="reveal">
+      <div class="head" style="margin-bottom:22px">
+        <span class="label">Sobre nós</span>
+        <h2>50 anos de dedicação ao desenvolvimento infantil</h2>
+      </div>
+      <div class="txt">
+        <p>O <strong>Centro de Educação Infantil Perseverança</strong> é uma instituição <strong>sem fins lucrativos</strong> que há meio século oferece educação infantil em Paranaguá.</p>
+        <p>Com educadores qualificados e cuidado individualizado, acompanhamos cada criança de perto, em parceria com as famílias, para que a educação de qualidade seja acessível a todos.</p>
+      </div>
+      <div class="facts">
+        <div class="fact" data-sfx-hover><b data-conta="50">50</b><small>anos de história</small></div>
+        <div class="fact" data-sfx-hover><b data-conta="5">5</b><small>turmas, do Berçário ao Infantil 5</small></div>
+        <div class="fact" data-sfx-hover><b>100%</b><small>sem fins lucrativos</small></div>
+        <div class="fact" data-sfx-hover><b>Família</b><small>parceira em cada etapa</small></div>
+      </div>
+    </div>
+    <div class="drawing reveal" aria-hidden="true">
+      <svg viewBox="0 0 400 400">
+        <circle cx="200" cy="200" r="190" fill="var(--surface-2)"/>
+        <path d="M30 270 Q 200 220 370 270 L 370 330 Q 200 400 30 330 Z" fill="var(--leaf)" opacity=".85"/>
+        <g class="bob"><rect x="80" y="210" width="60" height="60" rx="10" fill="#FF6B4A"/><text x="110" y="252" text-anchor="middle" font-family="Fredoka" font-weight="700" font-size="34" fill="#fff">A</text></g>
+        <g class="bob" style="animation-delay:-1.2s"><rect x="150" y="180" width="60" height="60" rx="10" fill="#3BA7E0"/><text x="180" y="222" text-anchor="middle" font-family="Fredoka" font-weight="700" font-size="34" fill="#fff">B</text></g>
+        <g class="bob" style="animation-delay:-2.4s"><rect x="220" y="205" width="60" height="60" rx="10" fill="#FFC233"/><text x="250" y="247" text-anchor="middle" font-family="Fredoka" font-weight="700" font-size="34" fill="#3A2A00">C</text></g>
+        <path d="M310 260 V 150" stroke="#0F5C3C" stroke-width="8" stroke-linecap="round"/>
+        <path d="M310 190 C 300 160 270 150 250 160 C 260 185 285 195 310 190Z" fill="#1F8A5B"/>
+        <path d="M310 170 C 320 140 350 130 370 140 C 360 165 335 175 310 170Z" fill="#1F8A5B"/>
+        <g class="bob" style="animation-delay:-.6s"><circle cx="300" cy="95" r="26" fill="#FFC233"/></g>
+        <path d="M70 110 q 20 -24 40 0 q 20 -24 40 0" stroke="#8E5BD6" stroke-width="6" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- COMO EDUCAMOS -->
+<section class="block alt" id="educar">
+  <div class="wrap">
+    <div class="head reveal">
+      <span class="label">Nossa forma de educar</span>
+      <h2>A criança no centro de tudo</h2>
+      <p>Um ambiente estimulante e acolhedor, onde cada descoberta é valorizada.</p>
+    </div>
+    <div class="pillars">
+      <article class="pillar p1 reveal" data-sfx-hover><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l6 6-9 9H5v-6z"/><path d="M12 6l6 6"/></svg></span><h3>Aprendizado ativo</h3><p>A criança explora, experimenta e participa. Aprender é fazer, tocar, brincar e perguntar.</p><span class="n" aria-hidden="true">1</span></article>
+      <article class="pillar p2 reveal" data-sfx-hover><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg></span><h3>Aprendizado significativo</h3><p>O que se aprende faz sentido no dia a dia da criança e se liga ao que ela já conhece.</p><span class="n" aria-hidden="true">2</span></article>
+      <article class="pillar p3 reveal" data-sfx-hover><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7c-3-3-8-1-8 4 0 6 5 10 8 10s8-4 8-10c0-5-5-7-8-4z"/><path d="M12 7c0-2 1-4 3-4"/></svg></span><h3>Alimentação nutritiva</h3><p>Refeições equilibradas que sustentam o crescimento e criam bons hábitos desde cedo.</p><span class="n" aria-hidden="true">3</span></article>
+      <article class="pillar p4 reveal" data-sfx-hover><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="7" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M2.5 20a5.5 5.5 0 0 1 11 0M14 20a4 4 0 0 1 7.5-1.8"/></svg></span><h3>Parceria com as famílias</h3><p>Escola e família caminham juntas, com diálogo próximo e acompanhamento de cada fase.</p><span class="n" aria-hidden="true">4</span></article>
+    </div>
+    <div class="socio reveal"><svg width="34" height="34" viewBox="0 0 24 24" fill="var(--berry)"><path d="M12 20.5s-8-4.7-8-10.6A4.4 4.4 0 0 1 12 7.4a4.4 4.4 0 0 1 8 2.5c0 5.9-8 10.6-8 10.6z"/></svg><div><b>Desenvolvimento socioemocional</b><p class="muted">Conviver, dividir, reconhecer sentimentos e fazer amigos também se aprende aqui.</p></div></div>
+  </div>
+</section>
+
+<!-- TURMAS -->
+<section class="block" id="turmas">
+  <div class="wrap">
+    <div class="head reveal">
+      <span class="label">Turmas ofertadas</span>
+      <h2>A trilha do crescimento</h2>
+      <p>Toque em cada parada para conhecer a turma e ver as vagas.</p>
+    </div>
+    <div class="trail reveal">
+      <svg class="trail-svg" id="trilha" viewBox="0 0 1000 230" role="group" aria-label="Turmas do Berçário ao Infantil 5"></svg>
+      <div class="turma-info" id="turmaInfo" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<!-- AVISOS -->
+<section class="block alt" id="avisos">
+  <div class="wrap">
+    <div class="head reveal">
+      <span class="label">Mural</span>
+      <h2>Avisos e agenda</h2>
+    </div>
+    <div class="news">
+      <div id="listaAvisos" aria-live="polite"><div class="skel" style="height:90px"></div><div class="skel" style="height:90px"></div></div>
+      <div><h3 style="font-size:22px">Próximos eventos</h3><div id="listaEventos" style="display:grid;gap:10px"><div class="skel" style="height:70px"></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PORTAIS -->
+<section class="block" id="portais">
+  <div class="wrap portals">
+    <a class="portal rp reveal" href="responsavel.html">
+      <span class="deco" aria-hidden="true"></span>
+      <span class="label">Para pais e responsáveis</span>
+      <h3>Área do Responsável</h3>
+      <ul><li>Pedido de matrícula e acompanhamento</li><li>Diário do dia da criança</li><li>Avisos da turma e frequência</li></ul>
+      <span class="go">Entrar <span aria-hidden="true">→</span></span>
+    </a>
+    <a class="portal eq reveal" href="equipe.html">
+      <span class="deco" aria-hidden="true"></span>
+      <span class="label">Acesso restrito</span>
+      <h3>Área da Equipe</h3>
+      <ul><li>Matrículas, crianças e turmas</li><li>Diário, chamada e avisos</li><li>Ponto e gestão da equipe</li></ul>
+      <span class="go">Entrar <span aria-hidden="true">→</span></span>
+    </a>
+  </div>
+</section>
+
+<!-- GALERIA -->
+<section class="block alt" id="galeria">
+  <div class="wrap">
+    <div class="head reveal"><span class="label">Galeria</span><h2>O dia a dia no Perseverança</h2></div>
+    <div class="gallery reveal">
+      <div class="ph" data-sfx-hover><span>Nosso espaço<small>Foto em breve</small></span></div>
+      <div class="ph" data-sfx-hover><span>Berçário<small>Foto em breve</small></span></div>
+      <div class="ph" data-sfx-hover><span>Hora do lanche<small>Foto em breve</small></span></div>
+      <div class="ph" data-sfx-hover><span>Brincadeiras no pátio<small>Foto em breve</small></span></div>
+      <div class="ph" data-sfx-hover><span>Arte e pintura<small>Foto em breve</small></span></div>
+      <div class="ph" data-sfx-hover><span>Festas e datas<small>Foto em breve</small></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ONDE ESTAMOS / CONTATO -->
+<section class="block" id="onde-estamos">
+  <div class="wrap">
+    <div class="head reveal"><span class="label">Onde estamos</span><h2>Tem alguma dúvida? Fale com a gente</h2></div>
+    <div class="contact">
+      <div class="info reveal">
+        <a class="map-card" href="https://www.google.com/maps/search/?api=1&query=R.%20Jos%C3%A9%20Ant%C3%B4nio%20Tempor%C3%A3o%2C%20169%2C%20Paranagu%C3%A1%20-%20PR" target="_blank" rel="noopener"><span class="pin"><i></i></span><span><b>R. José Antônio Temporão, 169</b><br><small>Paranaguá – PR · CEP 83203-290 · abrir no mapa</small></span></a>
+        <dl>
+          <div><dt>Telefone</dt><dd><span id="tel">(41) 3425-5968</span><button class="copy" type="button" data-copy="tel">Copiar</button></dd></div>
+          <div><dt>E-mail</dt><dd><span id="mail">secretaria@ceiperseveranca.org.br</span><button class="copy" type="button" data-copy="mail">Copiar</button></dd></div>
+          <div><dt>Atendimento</dt><dd>Segunda a sexta, das 8h às 12h e das 13h às 17h</dd></div>
+          <div><dt>Redes</dt><dd><a href="https://www.instagram.com/ceiperseveranca/" target="_blank" rel="noopener">@ceiperseveranca</a> · <a href="https://api.whatsapp.com/send?phone=554134255968" target="_blank" rel="noopener">WhatsApp</a></dd></div>
+        </dl>
+      </div>
+      <form class="card reveal" id="form" novalidate>
+        <h3 style="font-size:26px">Envie uma mensagem</h3>
+        <div class="grid2">
+          <label class="field" for="nome">Nome<input id="nome" required maxlength="120" autocomplete="name" placeholder="Seu nome"></label>
+          <label class="field" for="fone">Telefone<input id="fone" type="tel" maxlength="40" autocomplete="tel" placeholder="(41) 9 0000-0000"></label>
+        </div>
+        <div class="grid2">
+          <label class="field" for="email">E-mail<input id="email" type="email" required maxlength="200" autocomplete="email" placeholder="voce@email.com"></label>
+          <label class="field" for="assunto">Assunto<select id="assunto"><option>Dúvidas gerais</option><option>Vagas e matrícula</option><option>Visita ao CEI</option><option>Quero ajudar</option><option>Outro</option></select></label>
+        </div>
+        <label class="field" for="msg">Mensagem<textarea id="msg" required maxlength="3000" placeholder="Como podemos ajudar?"></textarea></label>
+        <div id="formMsg" role="status" aria-live="polite"></div>
+        <button class="btn btn-leaf" type="submit" style="justify-self:start" id="enviar">Enviar mensagem</button>
+      </form>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <a class="logo" href="#inicio" style="color:#fff"><img src="assets/logo.svg" alt="" width="50" height="50"><span><b>CEI Perseverança</b><small style="color:rgba(255,255,255,.75)">Paranaguá – PR</small></span></a>
+      <p style="margin-top:14px;opacity:.85;max-width:38ch">Centro de Educação Infantil Perseverança. Instituição sem fins lucrativos.</p>
+    </div>
+    <div><h4>Navegação</h4><ul><li><a href="#sobre">Sobre</a></li><li><a href="#turmas">Turmas</a></li><li><a href="#avisos">Avisos</a></li><li><a href="#onde-estamos">Onde estamos</a></li></ul></div>
+    <div><h4>Acessos</h4><ul><li><a href="responsavel.html">Área do Responsável</a></li><li><a href="equipe.html">Área da Equipe</a></li><li><a href="conta.html">Minha conta</a></li></ul></div>
+    <div><h4>Plataformas</h4><ul><li><a href="https://prof.saguiedu.com.br" target="_blank" rel="noopener">SaguiEdu · Educadores</a></li><li><a href="https://pais.saguiedu.com.br" target="_blank" rel="noopener">SaguiEdu · Responsáveis</a></li><li><a href="https://app2.saguiedu.com.br" target="_blank" rel="noopener">SaguiEdu · Gestão</a></li></ul></div>
+    <div class="bottom"><span>© <span id="ano">2026</span> Centro de Educação Infantil Perseverança</span><span>R. José Antônio Temporão, 169 · (41) 3425-5968</span></div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/pv.js"></script>
+<script>
+(async function(){
+  const {esc,fmtData,toast,som}=PV;
+  const $=s=>document.querySelector(s);
+  const reduz=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  $('#ano').textContent=new Date().getFullYear();
+
+  // menu mobile
+  const b=$('#burger'), m=$('#menu'), mq=matchMedia('(max-width:1120px)');
+  const sync=()=>{ m.hidden = mq.matches ? b.getAttribute('aria-expanded')!=='true' : false; };
+  b.onclick=()=>{ b.setAttribute('aria-expanded', b.getAttribute('aria-expanded')!=='true'); sync(); som.whoosh(); };
+  m.addEventListener('click',e=>{ if(e.target.closest('a')){ b.setAttribute('aria-expanded','false'); sync(); }});
+  mq.addEventListener('change',sync); sync();
+
+  // cipó de progresso
+  const vine=$('#vine');
+  const prog=()=>{ const h=document.documentElement; vine.style.setProperty('--p', (h.scrollTop/(h.scrollHeight-h.clientHeight||1)).toFixed(4)); };
+  addEventListener('scroll',prog,{passive:true}); prog();
+
+  // paralaxe do herói
+  const hero=$('#hero'), camadas=[...document.querySelectorAll('.layer[data-depth]')];
+  if(!reduz && matchMedia('(pointer:fine)').matches){
+    hero.addEventListener('pointermove',e=>{ const r=hero.getBoundingClientRect(), x=(e.clientX-r.left)/r.width-.5, y=(e.clientY-r.top)/r.height-.5; camadas.forEach(c=>{ const d=+c.dataset.depth; c.style.transform=`translate(${x*d}px,${y*d}px)`; }); });
+    hero.addEventListener('pointerleave',()=>camadas.forEach(c=>c.style.transform=''));
+  }
+
+  // bolhas que estouram
+  const cv=$('#bolhas'), cx=cv.getContext('2d'); let W=0,H=0,dpr=1, bolhas=[], faiscas=[];
+  const cores=['#FFC233','#FF6B4A','#3BA7E0','#1F8A5B','#8E5BD6','#FFFFFF'];
+  function tamanho(){ dpr=Math.min(2,devicePixelRatio||1); W=hero.clientWidth; H=hero.clientHeight; cv.width=W*dpr; cv.height=H*dpr; cx.setTransform(dpr,0,0,dpr,0,0); }
+  function nova(y){ const r=12+Math.random()*26; return {x:Math.random()*W, y:y??H-60+Math.random()*40, r, vy:.25+Math.random()*.55, fase:Math.random()*6.28, cor:cores[(Math.random()*cores.length)|0]}; }
+  function iniciarBolhas(){ tamanho(); const n=Math.round(Math.min(26,W/45)); bolhas=Array.from({length:n},()=>nova(Math.random()*H)); }
+  function desenhar(t){
+    cx.clearRect(0,0,W,H);
+    bolhas.forEach(bo=>{
+      if(!reduz){ bo.y-=bo.vy; bo.x+=Math.sin(t/900+bo.fase)*.35; }
+      if(bo.y<-bo.r) Object.assign(bo,nova());
+      cx.beginPath(); cx.arc(bo.x,bo.y,bo.r,0,7); cx.fillStyle=bo.cor+'40'; cx.fill(); cx.lineWidth=2.5; cx.strokeStyle=bo.cor+'cc'; cx.stroke();
+      cx.beginPath(); cx.arc(bo.x-bo.r*.35,bo.y-bo.r*.35,bo.r*.22,0,7); cx.fillStyle='rgba(255,255,255,.8)'; cx.fill();
+    });
+    faiscas=faiscas.filter(f=>f.v>0); faiscas.forEach(f=>{ f.x+=f.dx; f.y+=f.dy; f.dy+=.12; f.v-=.025; cx.globalAlpha=Math.max(0,f.v); cx.beginPath(); cx.arc(f.x,f.y,f.s,0,7); cx.fillStyle=f.cor; cx.fill(); cx.globalAlpha=1; });
+    requestAnimationFrame(desenhar);
+  }
+  let estouradas=0;
+  cv.addEventListener('pointerdown',e=>{
+    const r=cv.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top;
+    const i=bolhas.findIndex(bo=>Math.hypot(bo.x-x,bo.y-y)<bo.r+8);
+    if(i<0){ som.click(); return; }
+    const bo=bolhas[i]; for(let k=0;k<14;k++){ const a=k/14*6.28; faiscas.push({x:bo.x,y:bo.y,dx:Math.cos(a)*(2+Math.random()*2.5),dy:Math.sin(a)*(2+Math.random()*2.5),s:2+Math.random()*3,cor:bo.cor==='#FFFFFF'?'#3BA7E0':bo.cor,v:1}); }
+    bolhas[i]=nova(); som.pop(); estouradas++;
+    if(estouradas===10){ som.sucesso(); toast('Uau! 10 bolhas estouradas 🎈'); }
+  });
+  addEventListener('resize',()=>{ tamanho(); });
+  iniciarBolhas(); requestAnimationFrame(desenhar);
+  $('#mar').addEventListener('click',()=>som.onda());
+
+  // contadores
+  function contar(el,alvo){ if(reduz) return; const t0=performance.now(); const passo=t=>{ const k=Math.min(1,(t-t0)/1100); el.textContent=Math.round(alvo*(1-Math.pow(1-k,3))); if(k<1) requestAnimationFrame(passo); }; requestAnimationFrame(passo); }
+  const io=new IntersectionObserver(es=>es.forEach(en=>{ if(en.isIntersecting){ contar(en.target,+en.target.dataset.conta||50); io.unobserve(en.target); } }),{threshold:.6});
+  document.querySelectorAll('[data-conta]').forEach(el=>io.observe(el)); const n50=$('#num50'); n50.dataset.conta=50; io.observe(n50);
+
+  // copiar
+  document.querySelectorAll('.copy').forEach(btn=>btn.addEventListener('click',()=>{
+    const el=document.getElementById(btn.dataset.copy);
+    const sel=()=>{const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent='Selecionado';};
+    try{ navigator.clipboard.writeText(el.textContent).then(()=>{btn.textContent='Copiado';som.chime();},sel);}catch(e){sel();}
+    setTimeout(()=>btn.textContent='Copiar',1800);
+  }));
+
+  const api=await PV.conectar();
+
+  // conta conectada
+  async function conta(){ const p=await PV.montarMenuConta($('#acct'),api,undefined,{aoSair:conta}); document.querySelectorAll('[data-deslogado]').forEach(a=>a.hidden=!!p); }
+  conta();
+  try{ if(sessionStorage.getItem('pv-conta-excluida')){ sessionStorage.removeItem('pv-conta-excluida'); toast('Sua conta foi excluída.'); } }catch(e){}
+
+  // trilha das turmas
+  const DESC={1:'Os primeiros meses com muito colo, rotina tranquila e estímulos para os sentidos.',2:'Primeiros passos e primeiras palavras, explorando o mundo com segurança.',3:'Tempo de descobertas: cores, sons, histórias e muita brincadeira com os amigos.',4:'Pré-escola: linguagem, números e autonomia ganhando espaço no dia a dia.',5:'Preparação para o Ensino Fundamental, com curiosidade e confiança.'};
+  const COR=['#FF6B4A','#3BA7E0','#FFC233','#8E5BD6','#1F8A5B'];
+  let turmas=[]; try{ turmas=await api.vagasTurmas(); }catch(e){}
+  if(!turmas.length) turmas=[['Infantil 1 · Berçário','Bebês'],['Infantil 2','Primeiros passos'],['Infantil 3','Descobertas'],['Infantil 4','Pré-escola'],['Infantil 5','Pré-escola']].map((t,i)=>({nome:t[0],faixa:t[1],ordem:i+1,vagas:null,ocupadas:null}));
+  const pts=[[90,150],[290,80],[500,150],[710,80],[910,150]];
+  const svg=$('#trilha');
+  svg.innerHTML=`<path class="path" d="M40 175 C 140 175 170 60 290 80 S 420 175 500 150 S 620 60 710 80 S 840 175 960 150"/>`+
+    turmas.slice(0,5).map((t,i)=>`<g class="stop" tabindex="0" role="button" aria-pressed="false" data-i="${i}" aria-label="${esc(t.nome)}"><circle class="bg" cx="${pts[i][0]}" cy="${pts[i][1]}" r="42" fill="${COR[i]}" stroke="var(--surface)" stroke-width="6"/><text x="${pts[i][0]}" y="${pts[i][1]+11}" text-anchor="middle" font-size="32" fill="${i===2?'#3A2A00':'#fff'}" style="fill:${i===2?'#3A2A00':'#fff'}">${i+1}</text><text x="${pts[i][0]}" y="${pts[i][1]+(i%2?-58:72)}" text-anchor="middle" font-size="20">${esc(t.nome.replace(' · ',' – '))}</text></g>`).join('')+
+    `<g class="sprout" id="broto"><path d="M0 0 V-34" stroke="#0F5C3C" stroke-width="5" stroke-linecap="round"/><path d="M0 -18 C -4 -32 -18 -36 -26 -30 C -20 -18 -8 -14 0 -18Z" fill="#1F8A5B"/><path d="M0 -26 C 4 -40 18 -44 26 -38 C 20 -26 8 -22 0 -26Z" fill="#1F8A5B"/></g>`;
+  function escolher(i,comSom){
+    const t=turmas[i]; svg.querySelectorAll('.stop').forEach(s=>s.setAttribute('aria-pressed',s.dataset.i==i));
+    $('#broto').setAttribute('transform',`translate(${pts[i][0]+34},${pts[i][1]-30})`); $('#broto').style.transform=`translate(${pts[i][0]+34}px,${pts[i][1]-30}px)`;
+    const temVagas=t.vagas!=null, livres=temVagas?Math.max(0,t.vagas-t.ocupadas):null, pct=temVagas&&t.vagas?Math.min(100,t.ocupadas/t.vagas*100):0;
+    $('#turmaInfo').innerHTML=`<div><span class="pill" style="background:${COR[i]};color:${i===2?'#3A2A00':'#fff'}">${esc(t.faixa||'')}</span><h3 style="margin-top:8px">${esc(t.nome)}</h3><p>${DESC[t.ordem]||''}</p></div>
+      <div class="vagas">${temVagas?`<b>${livres>0?livres+' vaga'+(livres===1?'':'s')+' disponíve'+(livres===1?'l':'is'):'Turma completa: entre na lista de espera'}</b><div class="bar"><i style="width:${pct}%"></i></div><small class="muted">${t.ocupadas} de ${t.vagas} lugares ocupados</small>`:'<b>Consulte as vagas</b>'}<a class="btn btn-coral btn-sm" href="responsavel.html#matricula" style="margin-top:6px">Solicitar vaga</a></div>`;
+    $('#turmaInfo').style.animation='none'; $('#turmaInfo').offsetHeight; $('#turmaInfo').style.animation='';
+    if(comSom) som.boing();
+  }
+  svg.querySelectorAll('.stop').forEach(s=>{ s.addEventListener('click',()=>escolher(+s.dataset.i,true)); s.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); escolher(+s.dataset.i,true); } }); s.addEventListener('pointerenter',()=>som.hover()); });
+  escolher(0,false);
+
+  // avisos e eventos
+  try{
+    const av=await api.avisos('publico');
+    $('#listaAvisos').innerHTML = av.length ? av.map((a,i)=>`<article class="aviso ${a.fixado?'fix':''}" style="animation-delay:${i*70}ms"><div style="display:flex;gap:8px;flex-wrap:wrap">${a.fixado?'<span class="pill coral">Fixado</span>':''}<span class="pill">${fmtData(a.created_at)}</span></div><h3>${esc(a.titulo)}</h3><p>${esc(a.corpo)}</p></article>`).join('')
+      : '<div class="empty"><b>Nenhum aviso no momento</b>Os comunicados do CEI aparecem aqui.</div>';
+  }catch(e){ $('#listaAvisos').innerHTML='<div class="msg bad">Não foi possível carregar os avisos agora.</div>'; }
+  try{
+    const ev=await api.eventos();
+    $('#listaEventos').innerHTML = ev.length ? ev.map((e,i)=>{const d=new Date(e.data+'T12:00:00');return `<div class="ev" style="animation-delay:${i*70}ms"><div class="d"><b>${String(d.getDate()).padStart(2,'0')}</b><small>${d.toLocaleDateString('pt-BR',{month:'short'}).replace('.','')}</small></div><div><h4>${esc(e.titulo)}</h4>${e.descricao?`<p>${esc(e.descricao)}</p>`:''}</div></div>`}).join('')
+      : '<div class="empty" style="padding:20px"><b>Agenda livre</b>Os próximos eventos aparecem aqui.</div>';
+  }catch(e){ $('#listaEventos').innerHTML='<div class="msg bad">Não foi possível carregar a agenda.</div>'; }
+
+  // contato
+  const f=$('#form'), out=$('#formMsg'), btn=$('#enviar');
+  f.addEventListener('submit',async e=>{
+    e.preventDefault();
+    const d={nome:f.nome.value.trim(),email:f.email.value.trim(),telefone:f.fone.value.trim()||null,assunto:f.assunto.value,mensagem:f.msg.value.trim()};
+    if(d.nome.length<2||!/^\S+@\S+\.\S+$/.test(d.email)||!d.mensagem){ out.className='msg bad'; out.textContent='Preencha nome, um e-mail válido e a mensagem.'; som.erro(); return; }
+    btn.disabled=true; btn.textContent='Enviando…';
+    try{ await api.enviarContato(d); out.className='msg ok'; out.textContent=`Obrigado, ${d.nome.split(' ')[0]}! Sua mensagem chegou à secretaria.`+(api.demo?' (Demonstração: no site publicado ela fica salva no sistema.)':''); f.reset(); som.sucesso(); }
+    catch(err){ out.className='msg bad'; out.textContent=err.message; som.erro(); }
+    btn.disabled=false; btn.textContent='Enviar mensagem';
+  });
+})();
+</script>
+</body>
+</html>

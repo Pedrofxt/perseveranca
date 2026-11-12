@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Área da Equipe · CEI Perseverança</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&family=Patrick+Hand&display=swap">
+<link rel="stylesheet" href="assets/pv.css">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.clock{background:var(--leaf-deep);color:#fff;border-radius:28px;padding:28px;display:grid;gap:18px;position:relative;overflow:hidden}
+.clock::before{content:"";position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.13) 1.5px,transparent 2.2px) 0 0/26px 26px}
+.clock>*{position:relative}
+.clock .time{font-family:var(--f-display);font-weight:700;font-size:clamp(54px,9vw,96px);line-height:.95;font-variant-numeric:tabular-nums}
+.clock .time .sec{color:var(--sun);font-size:.45em;margin-left:6px}
+.clock .date{font-family:var(--f-hand);font-size:22px;opacity:.85}
+.punch{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.punch button{border:2px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;border-radius:20px;padding:16px 10px;font:800 15px/1.2 var(--f-body);cursor:pointer;display:grid;gap:6px;justify-items:center;transition:transform .2s cubic-bezier(.3,1.6,.5,1),background .2s}
+.punch button:hover{transform:translateY(-3px);background:rgba(255,255,255,.16)}
+.punch button.next{background:var(--sun);color:#3A2A00;border-color:var(--sun);animation:pulse 2s ease-in-out infinite}
+.punch button.done{opacity:.55}
+.punch button svg{width:24px;height:24px}
+@media (max-width:700px){.punch{grid-template-columns:1fr 1fr}}
+.timeline{display:grid;position:relative;padding-left:22px}
+.timeline::before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:3px;border-radius:3px;background:var(--line)}
+.tl{position:relative;padding:8px 0;display:flex;justify-content:space-between;gap:10px;animation:viewIn .4s both}
+.tl::before{content:"";position:absolute;left:-20px;top:13px;width:12px;height:12px;border-radius:50%;background:var(--leaf);box-shadow:0 0 0 3px var(--bg)}
+.tl.saida::before,.tl.saida_intervalo::before{background:var(--coral)}
+.tl b{font-variant-numeric:tabular-nums}
+.tog{display:inline-flex;border-radius:999px;background:var(--surface-2);padding:4px;gap:4px}
+.tog button{border:0;border-radius:999px;padding:8px 14px;font:800 13.5px/1 var(--f-body);background:transparent;color:var(--muted);cursor:pointer}
+.tog button[aria-pressed="true"].p{background:var(--ok);color:#fff}
+.tog button[aria-pressed="true"].f{background:var(--bad);color:#fff}
+.lock{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;color:var(--coral)}
+.mcard{background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:18px;display:grid;gap:10px;animation:viewIn .4s both}
+.mcard.novo{border-color:var(--coral)}
+.mcard dl{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px 16px}
+.mcard dt{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.mcard dd{margin:0;font-weight:700;overflow-wrap:anywhere}
+.ftabs{display:flex;flex-wrap:wrap;gap:6px}
+.ftabs button{font:800 14px/1 var(--f-body);padding:10px 14px;border-radius:999px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.ftabs button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.ftabs .c{background:var(--surface-2);color:var(--ink);border-radius:999px;padding:1px 7px;font-size:12px}
+.dcard{background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:16px;display:grid;gap:12px;animation:viewIn .4s both}
+.dcard.salvo{border-color:var(--leaf)}
+.dcard .cab{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.dcard .face{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--f-display);font-weight:700;font-size:18px;flex:none}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opts button{border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:7px 11px;font:700 13.5px/1 var(--f-body);cursor:pointer;transition:transform .15s}
+.opts button:hover{transform:translateY(-2px)}
+.opts button[aria-pressed="true"]{background:var(--leaf);border-color:var(--leaf);color:#fff}
+.opts-l{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.ausente{opacity:.55}
+</style>
+</head>
+<body>
+<div id="demoBar" class="demo-bar" hidden>Modo demonstração: dados de exemplo. No site publicado, o login usa o Supabase.</div>
+
+<div id="telaCarregando" style="min-height:100vh;display:grid;place-items:center;align-content:center;gap:14px;text-align:center">
+  <img src="assets/logo.svg" alt="" style="width:110px;margin:auto;animation:float 2s ease-in-out infinite">
+  <p class="muted" style="font-weight:800">Carregando…</p>
+</div>
+
+<section class="auth" id="telaLogin" hidden>
+  <div class="auth-art" style="background:var(--leaf-deep)">
+    <a href="index.html" style="color:#fff;font-weight:800;text-decoration:none">← Voltar ao site</a>
+    <img class="crest" src="assets/logo.svg" alt="Emblema do CEI Perseverança">
+    <div style="display:grid;gap:12px;padding-bottom:40px">
+      <span class="label">Acesso restrito à equipe</span>
+      <h1>Direção, secretaria, professores e funcionários</h1>
+      <p>Cada perfil vê só o que precisa: ponto, diário, chamada, matrículas, crianças, avisos e gestão.</p>
+    </div>
+    <span class="wave" aria-hidden="true"></span>
+  </div>
+  <div class="auth-form">
+    <form id="fLogin" novalidate>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h2 id="tLogin">Entrar</h2><span style="display:flex;gap:8px"><button class="icon-toggle sound-toggle" type="button"></button><button class="icon-toggle theme-toggle" type="button"></button></span></div>
+      <div class="auth-switch" role="group" aria-label="Escolha">
+        <button type="button" data-modo="entrar" aria-pressed="true">Entrar</button>
+        <button type="button" data-modo="criar" aria-pressed="false">Criar conta</button>
+      </div>
+      <div id="demoRoles" hidden style="display:grid;gap:8px">
+        <p class="muted">Na demonstração, escolha um perfil:</p>
+        <div class="demo-roles">
+          <button class="btn btn-coral btn-sm" type="button" data-papel="diretor">Direção</button>
+          <button class="btn btn-leaf btn-sm" type="button" data-papel="secretario">Secretaria</button>
+          <button class="btn btn-sun btn-sm" type="button" data-papel="professor">Professora</button>
+          <button class="btn btn-soft btn-sm" type="button" data-papel="funcionario">Funcionário</button>
+        </div>
+      </div>
+      <label class="field" for="lNome" id="wNome" hidden>Nome completo<input id="lNome" autocomplete="name" maxlength="120"></label>
+      <label class="field" for="lEmail">E-mail<input id="lEmail" type="email" autocomplete="email" required></label>
+      <label class="field" for="lSenha">Senha<input id="lSenha" type="password" autocomplete="current-password" minlength="6" required></label>
+      <div id="lMsg" role="status" aria-live="polite"></div>
+      <button class="btn btn-leaf" type="submit" id="lBtn">Entrar</button>
+      <button class="btn btn-soft btn-sm" type="button" id="esqueci" style="justify-self:start">Esqueci minha senha</button>
+      <p class="hint">A primeira conta criada aqui vira Direção. As demais ficam aguardando liberação, a menos que tenham convite.</p>
+    </form>
+  </div>
+</section>
+
+<section class="auth" id="telaSenha" hidden>
+  <div class="auth-art" style="background:var(--leaf-deep)"><img class="crest" src="assets/logo.svg" alt=""><h1>Crie uma nova senha</h1><span class="wave" aria-hidden="true"></span></div>
+  <div class="auth-form"><form id="fSenha"><h2>Nova senha</h2><label class="field" for="nSenha">Nova senha<input id="nSenha" type="password" minlength="6" autocomplete="new-password" required></label><div id="nMsg"></div><button class="btn btn-leaf" type="submit">Salvar senha</button></form></div>
+</section>
+
+<div class="app" id="telaApp" hidden>
+  <aside class="side" id="side">
+    <a class="brand" href="index.html"><img src="assets/logo.svg" alt=""><span><b>CEI Perseverança</b><small>Área da Equipe</small></span></a>
+    <nav id="nav"></nav>
+    <div class="who"><div style="display:flex;gap:10px;align-items:center"><span id="whoAv"></span><b id="whoNome" style="min-width:0;overflow-wrap:anywhere"></b></div><span class="pill sun" id="whoPapel" style="justify-self:start"></span><button class="btn btn-ghost btn-sm" id="sair" style="color:#fff;justify-self:start">Sair</button></div>
+  </aside>
+  <main class="main has-acct" id="main"></main>
+  <div class="acct-fixed"><button class="icon-toggle sound-toggle" type="button"></button><button class="icon-toggle theme-toggle" type="button"></button><div class="acct" id="acct"></div></div>
+</div>
+
+<dialog id="dlg"><form method="dialog" id="dlgForm"></form></dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/pv.js"></script>
+<script>
+(async function(){
+  const {esc,fmtData,fmtDia,fmtHora,toast,som,hojeISO,diaLocal,idade,PAPEIS,PONTO,STATUS,stClasse,horasDoDia,fmtHoras}=PV;
+  const $=s=>document.querySelector(s);
+  const api=await PV.conectar();
+  if(api.demo){ $('#demoBar').hidden=false; $('#demoRoles').hidden=false; }
+  let perfil=null, modo='entrar', ultimo=null, relogio=null, turmasC=null;
+  const main=$('#main');
+  const EQUIPE=PV.EQUIPE, SALA=['professor','secretario','diretor'], GESTAO=['secretario','diretor'], DIR=['diretor'];
+  const pode=r=>perfil&&r.includes(perfil.papel);
+  const CORF=['#FF6B4A','#3BA7E0','#1F8A5B','#8E5BD6','#D69A00'];
+  const corDe=n=>CORF[[...String(n)].reduce((a,c)=>a+c.charCodeAt(0),0)%CORF.length];
+
+  const ICON={casa:'<path d="M3 10l9-7 9 7v11H3z"/>',relogio:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',diario:'<path d="M4 4h12a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4z"/><path d="M8 9h8M8 13h6"/>',cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 15l2 2 4-4"/>',mat:'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M9 15l2 2 4-4"/>',kids:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2A5 5 0 0 1 21.5 19"/>',turmas:'<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',mega:'<path d="M3 11l15-6v14L3 13z"/><path d="M7 13v5"/>',agenda:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',msg:'<path d="M4 5h16v11H8l-4 4z"/>',chave:'<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3"/>',escudo:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',rel:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'};
+  const NAV=[{g:'Meu dia'},{v:'inicio',t:'Início',i:'casa',r:EQUIPE},{v:'ponto',t:'Bater ponto',i:'relogio',r:EQUIPE},
+    {g:'Sala',r:SALA},{v:'diario',t:'Diário da turma',i:'diario',r:SALA},{v:'chamada',t:'Chamada',i:'cal',r:SALA},
+    {g:'Secretaria',r:GESTAO},{v:'matriculas',t:'Matrículas',i:'mat',r:GESTAO},{v:'criancas',t:'Crianças',i:'kids',r:GESTAO},{v:'turmas',t:'Turmas e vagas',i:'turmas',r:GESTAO},{v:'avisos',t:'Avisos',i:'mega',r:GESTAO},{v:'agenda',t:'Agenda',i:'agenda',r:GESTAO},{v:'contatos',t:'Mensagens do site',i:'msg',r:GESTAO},{v:'convites',t:'Convites de acesso',i:'chave',r:GESTAO},
+    {g:'Direção',r:DIR},{v:'usuarios',t:'Equipe e permissões',i:'escudo',r:DIR},{v:'relponto',t:'Relatório de ponto',i:'rel',r:DIR}];
+  function montarNav(){ $('#nav').innerHTML=NAV.filter(n=>!n.r||pode(n.r)).map(n=>n.g?`<span class="group">${n.g}</span>`:`<button data-v="${n.v}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${ICON[n.i]}</svg>${n.t}${n.v==='matriculas'?'<span class="badge" id="bMat" hidden></span>':''}</button>`).join(''); }
+  async function badgeMat(){ if(!pode(GESTAO)) return; try{ const ms=await api.matriculas(); const n=ms.filter(m=>m.status==='enviada').length; const b=$('#bMat'); if(b){ b.hidden=!n; b.textContent=n; } }catch(e){} }
+  $('#nav').addEventListener('click',e=>{ const b=e.target.closest('button[data-v]'); if(b){ ir(b.dataset.v); $('#side').classList.remove('open'); } });
+  function ir(v){
+    const it=NAV.find(n=>n.v===v); if(!it||!pode(it.r)) v='inicio';
+    clearInterval(relogio); som.whoosh();
+    document.querySelectorAll('#nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.v===v?'page':'false'));
+    try{ sessionStorage.setItem('pv-equipe-view',v); }catch(e){}
+    V[v]().catch(err=>{ main.innerHTML=topo('Algo deu errado')+`<div class="msg bad">${esc(err.message)}</div>`; });
+    scrollTo({top:0});
+  }
+  window.PV_ir=ir;
+  function topo(t,sub,extra){ return `<div class="topline"><div style="display:flex;gap:10px;align-items:center"><button class="btn btn-soft btn-sm mobile-nav" onclick="document.getElementById('side').classList.add('open')" aria-label="Abrir menu">☰ Menu</button><div><h1>${t}</h1>${sub?`<p class="muted">${sub}</p>`:''}</div></div>${extra||''}</div>`; }
+  const loading='<div class="view"><div class="skel" style="height:140px"></div></div>';
+  async function turmas(){ return turmasC||(turmasC=await api.turmas()); }
+  const optTurmas=(ts,sel,vazio)=>(vazio?`<option value="">${vazio}</option>`:'')+ts.map(t=>`<option value="${t.id}" ${t.id===sel?'selected':''}>${esc(t.nome)}</option>`).join('');
+  const mesRange=ym=>{ const [y,m]=ym.split('-').map(Number); return [new Date(y,m-1,1).toISOString(),new Date(y,m,1).toISOString()]; };
+  const mesAtual=()=>hojeISO().slice(0,7);
+  function dialogo(html,onOk,rotulo){
+    const d=$('#dlg'), f=$('#dlgForm'); f.innerHTML=html+`<div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-soft btn-sm" value="cancel" formnovalidate>Cancelar</button><button class="btn btn-leaf btn-sm" value="ok">${rotulo||'Confirmar'}</button></div>`;
+    d.onclose=async()=>{ if(d.returnValue==='ok'){ try{ await onOk(f); }catch(err){ toast(err.message,'bad'); } } }; d.returnValue=''; d.showModal();
+  }
+  const confirmar=(txt,fn,rot)=>dialogo(`<h3 style="font-size:22px">Confirmar</h3><p class="muted">${txt}</p>`,fn,rot);
+  const face=n=>`<span class="face" style="background:${corDe(n)}">${esc(String(n).trim()[0]||'?')}</span>`;
+
+  const V={};
+
+  /* ---------- início ---------- */
+  V.inicio=async()=>{
+    main.innerHTML=topo('Olá, '+esc(perfil.nome.split(' ')[0])+'!')+loading;
+    const hoje=new Date(); hoje.setHours(0,0,0,0); const am=new Date(hoje); am.setDate(am.getDate()+1);
+    const [meus,avE]=await Promise.all([api.pontos(hoje.toISOString(),am.toISOString(),false),api.avisos('equipe')]);
+    const ex={};
+    if(pode(GESTAO)){ const [ms,cs,ct]=await Promise.all([api.matriculas(),api.criancas(),api.contatos()]); ex.novas=ms.filter(m=>m.status==='enviada').length; ex.espera=ms.filter(m=>m.status==='lista de espera').length; ex.criancas=cs.length; ex.msgs=ct.filter(c=>c.status==='novo').length; }
+    if(pode(DIR)){ const [ps,pf]=await Promise.all([api.pontos(hoje.toISOString(),am.toISOString(),true),api.perfis()]); ex.presentes=new Set(ps.filter(p=>p.tipo==='entrada').map(p=>p.user_id)).size; ex.equipe=pf.filter(p=>EQUIPE.includes(p.papel)&&p.ativo).length; ex.pend=pf.filter(p=>p.papel==='pendente').length; }
+    const ult=meus[meus.length-1];
+    const st=[`<div class="stat"><span class="v">${meus.length?fmtHora(meus[0].registrado_em):'—'}</span><span class="k">Sua entrada hoje</span></div>`,`<div class="stat" style="--accent:var(--sun)"><span class="v">${fmtHoras(horasDoDia(meus))}</span><span class="k">Trabalhado hoje</span></div>`];
+    if(ex.novas!=null) st.push(`<div class="stat" style="--accent:var(--coral)"><span class="v">${ex.novas}</span><span class="k">Pedidos de matrícula novos</span></div>`,`<div class="stat" style="--accent:var(--sea)"><span class="v">${ex.criancas}</span><span class="k">Crianças matriculadas</span></div>`);
+    if(ex.presentes!=null) st.push(`<div class="stat" style="--accent:var(--leaf)"><span class="v">${ex.presentes}/${ex.equipe}</span><span class="k">Equipe com entrada hoje</span></div>`);
+    main.innerHTML=topo('Olá, '+esc(perfil.nome.split(' ')[0])+'!',PAPEIS[perfil.papel]+' · '+new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}),`<button class="btn ${ult&&ult.tipo!=='saida'?'btn-soft':'btn-coral'}" onclick="PV_ir('ponto')">${!ult?'Bater entrada':ult.tipo==='saida'?'Ponto encerrado hoje':'Bater ponto'}</button>`)+`<div class="view">
+      <div class="stats">${st.join('')}</div>
+      ${ex.novas?`<div class="msg warn">Há ${ex.novas} pedido(s) de matrícula esperando análise. <a href="#" onclick="PV_ir('matriculas');return false">Analisar agora</a></div>`:''}
+      ${ex.msgs?`<div class="msg warn">${ex.msgs} mensagem(ns) nova(s) do site. <a href="#" onclick="PV_ir('contatos');return false">Ver mensagens</a></div>`:''}
+      ${ex.pend?`<div class="msg warn">${ex.pend} conta(s) aguardando liberação. <a href="#" onclick="PV_ir('usuarios');return false">Liberar</a></div>`:''}
+      ${pode(SALA)?`<div class="card" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between"><div><b style="font-family:var(--f-display);font-size:20px">Diário de hoje</b><p class="muted">As famílias leem o diário na Área do Responsável.</p></div><span style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sun btn-sm" onclick="PV_ir('diario')">Escrever diário</button><button class="btn btn-soft btn-sm" onclick="PV_ir('chamada')">Fazer chamada</button></span></div>`:''}
+      <div class="split2">
+        <div style="display:grid;gap:10px;align-content:start"><h3 style="font-size:22px">Avisos da equipe</h3>${avE.length?avE.map(a=>`<article class="item"><div class="row"><h3>${esc(a.titulo)}</h3><span class="pill">${fmtData(a.created_at)}</span></div><p>${esc(a.corpo)}</p></article>`).join(''):'<div class="empty"><b>Sem avisos internos</b></div>'}</div>
+        <div class="card" style="display:grid;gap:10px;align-content:start"><h3 style="font-size:22px">Seu ponto hoje</h3>${meus.length?`<div class="timeline">${meus.map(p=>`<div class="tl ${p.tipo}"><span>${PONTO[p.tipo]}</span><b>${fmtHora(p.registrado_em)}</b></div>`).join('')}</div>`:'<p class="muted">Nenhuma batida hoje.</p>'}</div>
+      </div></div>`;
+  };
+
+  /* ---------- ponto ---------- */
+  V.ponto=async()=>{
+    const hoje=new Date(); hoje.setHours(0,0,0,0); const am=new Date(hoje); am.setDate(am.getDate()+1); let mes=mesAtual();
+    const ic={entrada:'<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/>',saida_intervalo:'<path d="M17 8h1a4 4 0 0 1 0 8h-1M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z"/>',retorno_intervalo:'<path d="M1 4v6h6M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/>',saida:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>'};
+    async function render(){
+      const [hp,mp]=await Promise.all([api.pontos(hoje.toISOString(),am.toISOString(),false),api.pontos(...mesRange(mes),false)]);
+      const feitos=new Set(hp.map(p=>p.tipo)), ordem=['entrada','saida_intervalo','retorno_intervalo','saida'], ult=hp[hp.length-1];
+      const prox=!ult?'entrada':ult.tipo==='entrada'?'saida_intervalo':ult.tipo==='saida_intervalo'?'retorno_intervalo':ult.tipo==='retorno_intervalo'?'saida':null;
+      const dias={}; mp.forEach(p=>(dias[diaLocal(p.registrado_em)]=dias[diaLocal(p.registrado_em)]||[]).push(p));
+      const ks=Object.keys(dias).sort().reverse(), tot=ks.reduce((s,k)=>s+horasDoDia(dias[k]),0);
+      const col=(a,t)=>{const x=a.find(p=>p.tipo===t); return x?`${fmtHora(x.registrado_em)}${x.ajustado_por?' *':''}`:'<span class="muted">—</span>';};
+      main.innerHTML=topo('Bater ponto','O horário é registrado pelo servidor do CEI.')+`<div class="view">
+        <div class="clock"><div><div class="time" id="hh">--:--<span class="sec">--</span></div><div class="date">${new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div></div>
+          <div class="punch">${ordem.map(t=>`<button data-t="${t}" class="${t===prox?'next':feitos.has(t)?'done':''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${ic[t]}</svg>${PONTO[t]}${feitos.has(t)?`<small style="opacity:.85">${fmtHora(hp.filter(p=>p.tipo===t).pop().registrado_em)}</small>`:''}</button>`).join('')}</div>
+          <label class="field" for="obs" style="color:#fff">Observação (opcional)<input id="obs" maxlength="300" placeholder="Ex.: reunião externa, consulta"></label></div>
+        <div class="split2">
+          <div class="card" style="display:grid;gap:10px;align-content:start"><h3 style="font-size:22px">Hoje</h3>${hp.length?`<div class="timeline">${hp.map(p=>`<div class="tl ${p.tipo}"><span>${PONTO[p.tipo]}${p.observacao?`<br><small class="muted">${esc(p.observacao)}</small>`:''}</span><b>${fmtHora(p.registrado_em)}</b></div>`).join('')}</div><p><b>Total: ${fmtHoras(horasDoDia(hp))}</b></p>`:'<p class="muted">Nenhuma batida ainda. Toque em “Entrada”.</p>'}</div>
+          <div class="card" style="display:grid;gap:10px;align-content:start"><label class="field" for="mes">Mês<input type="month" id="mes" value="${mes}"></label><div class="stat" style="--accent:var(--sun)"><span class="v">${fmtHoras(tot)}</span><span class="k">Total no mês · ${ks.length} dia(s)</span></div></div>
+        </div>
+        <div class="table-wrap"><table><thead><tr><th>Dia</th><th>Entrada</th><th>Saída int.</th><th>Volta int.</th><th>Saída</th><th class="num">Total</th></tr></thead><tbody>${ks.length?ks.map(k=>`<tr><td><b>${new Date(k+'T12:00').toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})}</b></td><td>${col(dias[k],'entrada')}</td><td>${col(dias[k],'saida_intervalo')}</td><td>${col(dias[k],'retorno_intervalo')}</td><td>${col(dias[k],'saida')}</td><td class="num"><b>${fmtHoras(horasDoDia(dias[k]))}</b></td></tr>`).join(''):'<tr><td colspan="6" class="muted">Nenhum registro neste mês.</td></tr>'}</tbody></table></div>
+        <p class="hint">* ajustado pela direção. Correções de ponto são feitas só pela direção.</p></div>`;
+      const tick=()=>{ const n=new Date(), el=$('#hh'); if(el) el.innerHTML=n.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+`<span class="sec">${String(n.getSeconds()).padStart(2,'0')}</span>`; };
+      tick(); clearInterval(relogio); relogio=setInterval(tick,1000);
+      document.querySelectorAll('.punch button').forEach(b=>b.addEventListener('click',()=>{
+        const t=b.dataset.t, obs=$('#obs').value.trim();
+        const go=async()=>{ b.disabled=true; await api.baterPonto(t,obs); som.ponto(); toast(PONTO[t]+' registrada às '+fmtHora(new Date())); render(); };
+        if(feitos.has(t)||(prox&&t!==prox)) confirmar(`Você vai registrar <b>${PONTO[t]}</b> fora da sequência esperada. Continuar?`,go,'Registrar');
+        else go().catch(err=>{ toast(err.message,'bad'); b.disabled=false; });
+      }));
+      $('#mes').onchange=e=>{ mes=e.target.value||mesAtual(); render(); };
+    }
+    main.innerHTML=topo('Bater ponto')+loading; await render();
+  };
+
+  /* ---------- diário da turma ---------- */
+  V.diario=async()=>{
+    const ts=await turmas(); let tSel=ts[2]?.id||ts[0]?.id, data=hojeISO();
+    const OPC={alimentacao:['Comeu tudo','Comeu bem','Comeu pouco','Não quis comer'],sono:['Dormiu bem','Dormiu pouco','Não dormiu'],humor:['Muito feliz','Tranquilo(a)','Sonolento(a)','Choroso(a)','Agitado(a)']};
+    const ROT={alimentacao:'Alimentação',sono:'Sono',humor:'Humor'};
+    main.innerHTML=topo('Diário da turma','Registre como foi o dia de cada criança. A família lê na Área do Responsável.')+`<div class="view">
+      <div class="toolbar card"><label class="field" for="dT">Turma<select id="dT">${optTurmas(ts,tSel)}</select></label><label class="field" for="dD" style="max-width:200px">Data<input type="date" id="dD" value="${data}" max="${hojeISO()}"></label></div>
+      <div class="card" style="display:grid;gap:10px"><label class="field" for="dAtiv">Atividades do dia (vale para toda a turma)<textarea id="dAtiv" maxlength="1500" style="min-height:70px" placeholder="Ex.: pintura com tinta guache, roda de música e brincadeira no pátio"></textarea></label><span class="hint">Você pode mudar o texto de uma criança específica no cartão dela.</span></div>
+      <div id="dArea" class="list"></div></div>`;
+    let estado={}, criancas=[];
+    async function carregar(){
+      const area=$('#dArea'); area.innerHTML='<div class="skel" style="height:200px"></div>';
+      criancas=await api.criancas(tSel); const ids=criancas.map(c=>c.id);
+      const [ds,fs]=await Promise.all([api.diariosTurma(ids,data),api.freqTurma(ids,data)]);
+      const fm={}; fs.forEach(f=>fm[f.crianca_id]=f.presente);
+      estado={}; criancas.forEach(c=>{ const d=ds.find(x=>x.crianca_id===c.id); estado[c.id]=d?{...d,_salvo:true}:{crianca_id:c.id,data,alimentacao:null,sono:null,humor:null,atividades:'',recado:''}; estado[c.id]._ausente=fm[c.id]===false; });
+      const comum=ds.find(d=>d.atividades)?.atividades||''; $('#dAtiv').value=comum;
+      if(!criancas.length){ area.innerHTML='<div class="empty"><b>Nenhuma criança nesta turma</b>As crianças entram aqui quando a matrícula é aprovada.</div>'; return; }
+      area.innerHTML=criancas.map((c,i)=>{ const e=estado[c.id]; return `<div class="dcard ${e._salvo?'salvo':''} ${e._ausente?'ausente':''}" style="animation-delay:${i*30}ms" data-c="${c.id}">
+        <div class="cab"><span style="display:flex;gap:10px;align-items:center">${face(c.nome)}<span><b>${esc(c.nome)}</b><br><small class="muted">${idade(c.data_nascimento)}</small></span></span>
+          <span style="display:flex;gap:6px;flex-wrap:wrap">${e._ausente?'<span class="pill bad">Faltou</span>':''}${e._salvo?(e.lido_em?'<span class="pill ok">✓ Lido pela família</span>':'<span class="pill">Salvo · ainda não lido</span>'):''}</span></div>
+        ${Object.keys(OPC).map(k=>`<div style="display:grid;gap:6px"><span class="opts-l">${ROT[k]}</span><div class="opts">${OPC[k].map(o=>`<button type="button" data-k="${k}" data-o="${esc(o)}" aria-pressed="${e[k]===o}">${esc(o)}</button>`).join('')}</div></div>`).join('')}
+        <label class="field" for="at-${c.id}">Atividades (se diferente da turma)<input id="at-${c.id}" data-campo="atividades" maxlength="1500" value="${esc(e.atividades&&e.atividades!==comum?e.atividades:'')}" placeholder="Deixe em branco para usar o texto da turma"></label>
+        <label class="field" for="rc-${c.id}">Recado para a família<textarea id="rc-${c.id}" data-campo="recado" maxlength="1500" style="min-height:64px" placeholder="Ex.: hoje ela fez um amigo novo!">${esc(e.recado||'')}</textarea></label>
+      </div>`; }).join('')+`<div class="topline"><span class="muted" id="dCont"></span><button class="btn btn-leaf" id="dSalvar">Salvar diário</button></div>`;
+      const cont=()=>{ const n=criancas.filter(c=>{const e=estado[c.id]; return e.alimentacao||e.sono||e.humor||e.recado;}).length; $('#dCont').textContent=`${n} de ${criancas.length} criança(s) com registro`; };
+      area.querySelectorAll('.opts button').forEach(b=>b.onclick=()=>{ const c=b.closest('[data-c]').dataset.c, k=b.dataset.k; estado[c][k]=estado[c][k]===b.dataset.o?null:b.dataset.o; b.parentElement.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.o===estado[c][k])); som.pop(); cont(); });
+      area.querySelectorAll('[data-campo]').forEach(i=>i.oninput=()=>{ const c=i.closest('[data-c]').dataset.c; estado[c][i.dataset.campo==='atividades'?'_ativ':'recado']=i.value; cont(); });
+      cont();
+      $('#dSalvar').onclick=async e=>{
+        const comum=$('#dAtiv').value.trim();
+        const rows=criancas.map(c=>{ const s=estado[c.id]; const ativ=(s._ativ!=null?s._ativ:(s.atividades&&s.atividades!==comum?s.atividades:'')).trim()||comum; return {crianca_id:c.id,data,alimentacao:s.alimentacao,sono:s.sono,humor:s.humor,atividades:ativ||null,recado:(s.recado||'').trim()||null}; })
+          .filter(r=>r.alimentacao||r.sono||r.humor||r.recado||(r.atividades&&!estado[r.crianca_id]._ausente));
+        if(!rows.length){ toast('Preencha ao menos um item do diário.','bad'); return; }
+        e.target.disabled=true;
+        try{ for(const r of rows) await api.salvarDiario(r); som.sucesso(); toast(rows.length+' diário(s) salvo(s). As famílias já podem ler.'); carregar(); }
+        catch(err){ toast(err.message,'bad'); e.target.disabled=false; }
+      };
+    }
+    $('#dT').onchange=e=>{tSel=e.target.value;carregar();}; $('#dD').onchange=e=>{data=e.target.value||hojeISO();carregar();};
+    carregar();
+  };
+
+  /* ---------- chamada ---------- */
+  V.chamada=async()=>{
+    const ts=await turmas(); let tSel=ts[2]?.id||ts[0]?.id, data=hojeISO();
+    main.innerHTML=topo('Chamada','Todos começam presentes. Marque as faltas e salve.')+`<div class="view"><div class="toolbar card"><label class="field" for="fT">Turma<select id="fT">${optTurmas(ts,tSel)}</select></label><label class="field" for="fD" style="max-width:200px">Data<input type="date" id="fD" value="${data}" max="${hojeISO()}"></label></div><div id="fArea"></div></div>`;
+    async function carregar(){
+      const area=$('#fArea'); area.innerHTML='<div class="skel" style="height:200px"></div>';
+      const cs=await api.criancas(tSel), fs=await api.freqTurma(cs.map(c=>c.id),data), m={}; fs.forEach(f=>m[f.crianca_id]=f.presente);
+      if(!cs.length){ area.innerHTML='<div class="empty"><b>Nenhuma criança nesta turma</b></div>'; return; }
+      const st={}; cs.forEach(c=>st[c.id]=m[c.id]!==false);
+      const draw=()=>{ area.innerHTML=`${fs.length?'<div class="msg ok">Chamada deste dia já registrada. Você pode corrigir e salvar de novo.</div>':''}<div class="table-wrap"><table><thead><tr><th>Criança</th><th class="num">Situação</th></tr></thead><tbody>${cs.map(c=>`<tr><td><b>${esc(c.nome)}</b></td><td class="num"><span class="tog"><button class="p" data-a="${c.id}" data-v="1" aria-pressed="${st[c.id]}">Presente</button><button class="f" data-a="${c.id}" data-v="0" aria-pressed="${!st[c.id]}">Falta</button></span></td></tr>`).join('')}</tbody></table></div>
+        <div class="topline"><span class="muted">${Object.values(st).filter(x=>!x).length} falta(s) · ${cs.length} criança(s)</span><span style="display:flex;gap:8px"><button class="btn btn-soft" id="fTodos">Todos presentes</button><button class="btn btn-leaf" id="fSalvar">Salvar chamada</button></span></div>`;
+        area.querySelectorAll('.tog button').forEach(b=>b.onclick=()=>{ st[b.dataset.a]=b.dataset.v==='1'; draw(); });
+        $('#fTodos').onclick=()=>{ cs.forEach(c=>st[c.id]=true); draw(); };
+        $('#fSalvar').onclick=async e=>{ e.target.disabled=true; try{ await api.salvarFreq(cs.map(c=>({crianca_id:c.id,data,presente:st[c.id]}))); som.sucesso(); toast('Chamada salva'); carregar(); }catch(err){ toast(err.message,'bad'); e.target.disabled=false; } };
+      }; draw();
+    }
+    $('#fT').onchange=e=>{tSel=e.target.value;carregar();}; $('#fD').onchange=e=>{data=e.target.value||hojeISO();carregar();};
+    carregar();
+  };
+
+  /* ---------- matrículas ---------- */
+  V.matriculas=async()=>{
+    const ts=await turmas(); let filtro='enviada';
+    async function render(){
+      const ms=await api.matriculas(); const cont={}; STATUS.forEach(s=>cont[s]=ms.filter(m=>m.status===s).length);
+      const lista=ms.filter(m=>filtro==='todas'||m.status===filtro);
+      main.innerHTML=topo('Matrículas','Pedidos feitos pelas famílias na Área do Responsável')+`<div class="view">
+        <div class="ftabs">${['enviada','em análise','lista de espera','aprovada','recusada','cancelada','todas'].map(s=>`<button data-fl="${s}" aria-pressed="${s===filtro}">${s[0].toUpperCase()+s.slice(1)}${s!=='todas'?` <span class="c">${cont[s]}</span>`:''}</button>`).join('')}</div>
+        <div class="list">${lista.length?lista.map((m,i)=>`<article class="mcard ${m.status==='enviada'?'novo':''}" style="animation-delay:${i*40}ms">
+          <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between"><h3 style="font-size:21px">${esc(m.crianca_nome)}</h3><span class="${stClasse(m.status)}">${esc(m.status)}</span></div>
+          <dl><div><dt>Nascimento</dt><dd>${fmtData(m.crianca_nascimento)} · ${idade(m.crianca_nascimento)}</dd></div><div><dt>Turma desejada</dt><dd>${esc(m.turmas?.nome||'Indicar')} · ${esc(m.turno)}</dd></div><div><dt>Responsável</dt><dd>${esc(m.responsavel_nome)}${m.parentesco?' ('+esc(m.parentesco)+')':''}</dd></div><div><dt>Telefone</dt><dd>${esc(m.telefone)}</dd></div>${m.endereco?`<div><dt>Endereço</dt><dd>${esc(m.endereco)}</dd></div>`:''}<div><dt>Pedido em</dt><dd>${fmtData(m.created_at)}</dd></div></dl>
+          ${m.observacoes?`<p class="muted"><b>Observações:</b> ${esc(m.observacoes)}</p>`:''}
+          ${m.resposta?`<p class="muted"><b>Resposta enviada:</b> ${esc(m.resposta)}</p>`:''}
+          ${['aprovada','cancelada'].includes(m.status)?'':`<div class="actions" style="justify-content:flex-start">${m.status!=='em análise'?`<button class="iconbtn" data-ac="analise" data-id="${m.id}">Em análise</button>`:''}${m.status!=='lista de espera'?`<button class="iconbtn" data-ac="espera" data-id="${m.id}">Lista de espera</button>`:''}${m.status!=='recusada'?`<button class="iconbtn bad" data-ac="recusar" data-id="${m.id}">Recusar</button>`:''}<button class="btn btn-leaf btn-sm" data-ac="aprovar" data-id="${m.id}">Aprovar matrícula</button></div>`}
+        </article>`).join(''):'<div class="empty"><b>Nenhum pedido aqui</b>Os pedidos das famílias aparecem nesta tela.</div>'}</div></div>`;
+      document.querySelectorAll('[data-fl]').forEach(b=>b.onclick=()=>{ filtro=b.dataset.fl; render(); });
+      document.querySelectorAll('[data-ac]').forEach(b=>b.onclick=()=>{
+        const m=ms.find(x=>x.id===b.dataset.id), ac=b.dataset.ac;
+        if(ac==='aprovar') return dialogo(`<h3 style="font-size:22px">Aprovar matrícula de ${esc(m.crianca_nome)}</h3><p class="muted">A criança entra na turma escolhida e aparece para a família na Área do Responsável.</p><label class="field" for="apT">Turma<select id="apT">${optTurmas(ts,m.turma_id)}</select></label><label class="field" for="apR">Mensagem para a família<textarea id="apR" maxlength="1000" style="min-height:80px">Matrícula aprovada! Bem-vindos ao CEI Perseverança. Procure a secretaria para entregar os documentos.</textarea></label>`,async f=>{ await api.aprovarMatricula(m.id,f.querySelector('#apT').value,f.querySelector('#apR').value.trim()); som.sucesso(); toast('Matrícula aprovada'); turmasC=null; render(); badgeMat(); },'Aprovar');
+        const cfg={analise:['em análise','Pedido em análise','Recebemos seu pedido e estamos analisando.'],espera:['lista de espera','Colocar na lista de espera','No momento a turma está completa. Seu pedido está na lista de espera e avisaremos quando abrir uma vaga.'],recusar:['recusada','Recusar pedido','Infelizmente não conseguimos atender este pedido agora. Fale com a secretaria para mais informações.']}[ac];
+        dialogo(`<h3 style="font-size:22px">${cfg[1]}</h3><label class="field" for="rsp">Mensagem para a família<textarea id="rsp" maxlength="1000" style="min-height:90px">${cfg[2]}</textarea></label>`,async f=>{ await api.atualizarMatricula(m.id,{status:cfg[0],resposta:f.querySelector('#rsp').value.trim()||null}); toast('Pedido atualizado'); render(); badgeMat(); });
+      });
+    }
+    main.innerHTML=topo('Matrículas')+loading; render();
+  };
+
+  /* ---------- crianças ---------- */
+  V.criancas=async()=>{
+    const ts=await turmas(); let busca='', tF='';
+    main.innerHTML=topo('Crianças','Cadastro, turma e vínculo com o responsável',`<button class="btn btn-coral" id="novaC">+ Nova criança</button>`)+`<div class="view"><div class="toolbar card"><label class="field" for="cB">Buscar<input id="cB" placeholder="Nome da criança"></label><label class="field" for="cT">Turma<select id="cT">${optTurmas(ts,'','Todas')}</select></label></div><div id="cArea"></div></div>`;
+    async function carregar(){
+      const cs=await api.criancas(tF||null), l=cs.filter(c=>!busca||c.nome.toLowerCase().includes(busca));
+      $('#cArea').innerHTML=l.length?`<div class="table-wrap"><table><thead><tr><th>Criança</th><th>Turma</th><th>Responsável</th><th>Conta da família</th><th></th></tr></thead><tbody>${l.map(c=>`<tr><td><b>${esc(c.nome)}</b><br><small class="muted">${idade(c.data_nascimento)} · ${esc(c.turno)}</small></td><td>${esc(c.turmas?.nome||'—')}</td><td>${esc(c.responsavel_nome||'—')}<br><small class="muted">${esc(c.responsavel_telefone||'')}</small></td><td>${c.resp?`<span class="pill ok">${esc(c.resp.email||c.resp.nome)}</span>`:'<span class="pill warn">Sem conta</span>'}</td><td><div class="actions"><button class="iconbtn" data-ed="${c.id}">Editar</button><button class="iconbtn" data-vc="${c.id}">${c.resp?'Trocar conta':'Vincular conta'}</button><button class="iconbtn bad" data-dl="${c.id}">Desligar</button></div></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty"><b>Nenhuma criança encontrada</b>Aprove pedidos em Matrículas ou cadastre em “+ Nova criança”.</div>';
+      $('#cArea').querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>form(cs.find(c=>c.id===b.dataset.ed)));
+      $('#cArea').querySelectorAll('[data-vc]').forEach(b=>b.onclick=()=>{ const c=cs.find(x=>x.id===b.dataset.vc); dialogo(`<h3 style="font-size:22px">Vincular conta da família</h3><p class="muted">Digite o e-mail que o responsável por <b>${esc(c.nome)}</b> usou para criar a conta na Área do Responsável.</p><label class="field" for="vE">E-mail<input id="vE" type="email" required></label>`,async f=>{ const nome=await api.vincularResponsavel(c.id,f.querySelector('#vE').value.trim()); som.sucesso(); toast('Vinculado a '+nome); carregar(); },'Vincular'); });
+      $('#cArea').querySelectorAll('[data-dl]').forEach(b=>b.onclick=()=>confirmar('Desligar esta criança? Ela sai das turmas e da chamada, mas o histórico continua guardado.',async()=>{ await api.desligarCrianca(b.dataset.dl); toast('Criança desligada'); carregar(); },'Desligar'));
+    }
+    function form(c){ c=c||{turno:'Integral'}; dialogo(`<h3 style="font-size:22px">${c.id?'Editar criança':'Nova criança'}</h3>
+      <label class="field" for="kN">Nome completo<input id="kN" required value="${esc(c.nome||'')}"></label>
+      <div class="grid2"><label class="field" for="kD">Nascimento<input id="kD" type="date" value="${esc(c.data_nascimento||'')}"></label><label class="field" for="kTu">Turno<select id="kTu">${['Integral','Manhã','Tarde'].map(t=>`<option ${t===c.turno?'selected':''}>${t}</option>`).join('')}</select></label></div>
+      <label class="field" for="kT">Turma<select id="kT">${optTurmas(ts,c.turma_id,'Sem turma')}</select></label>
+      <div class="grid2"><label class="field" for="kR">Responsável<input id="kR" value="${esc(c.responsavel_nome||'')}"></label><label class="field" for="kF">Telefone<input id="kF" value="${esc(c.responsavel_telefone||'')}"></label></div>
+      <label class="field" for="kO">Observações<textarea id="kO" maxlength="1000" style="min-height:70px">${esc(c.observacoes||'')}</textarea></label>`,
+      async f=>{ const d={id:c.id,nome:f.querySelector('#kN').value.trim(),data_nascimento:f.querySelector('#kD').value,turno:f.querySelector('#kTu').value,turma_id:f.querySelector('#kT').value,responsavel_nome:f.querySelector('#kR').value.trim(),responsavel_telefone:f.querySelector('#kF').value.trim(),observacoes:f.querySelector('#kO').value.trim()}; if(d.nome.length<3) throw new Error('Informe o nome completo.'); await api.salvarCrianca(d); toast(c.id?'Dados atualizados':'Criança cadastrada'); carregar(); },'Salvar'); }
+    $('#novaC').onclick=()=>form(); $('#cB').oninput=e=>{busca=e.target.value.toLowerCase().trim();carregar();}; $('#cT').onchange=e=>{tF=e.target.value;carregar();};
+    carregar();
+  };
+
+  /* ---------- turmas ---------- */
+  V.turmas=async()=>{
+    main.innerHTML=topo('Turmas e vagas')+loading;
+    const vs=await api.vagasTurmas();
+    main.innerHTML=topo('Turmas e vagas','As vagas aparecem para as famílias no site e no pedido de matrícula')+`<div class="view"><div class="table-wrap"><table><thead><tr><th>Turma</th><th>Faixa</th><th class="num">Ocupadas</th><th class="num">Vagas totais</th><th class="num">Livres</th><th></th></tr></thead><tbody>${vs.map(t=>`<tr><td><b>${esc(t.nome)}</b></td><td><input id="fx-${t.id}" value="${esc(t.faixa||'')}" style="padding:8px 10px" aria-label="Faixa de ${esc(t.nome)}"></td><td class="num">${t.ocupadas}</td><td class="num"><input id="vg-${t.id}" type="number" min="0" max="200" value="${t.vagas}" style="width:90px;padding:8px 10px;text-align:right" aria-label="Vagas de ${esc(t.nome)}"></td><td class="num"><span class="pill ${t.vagas-t.ocupadas>0?'ok':'bad'}">${Math.max(0,t.vagas-t.ocupadas)}</span></td><td><button class="iconbtn" data-sv="${t.id}">Salvar</button></td></tr>`).join('')}</tbody></table></div></div>`;
+    document.querySelectorAll('[data-sv]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.sv, v=parseInt($('#vg-'+id).value,10); if(isNaN(v)||v<0){ toast('Informe um número de vagas válido.','bad'); return; } try{ await api.salvarTurma({id,vagas:v,faixa:$('#fx-'+id).value.trim()}); turmasC=null; toast('Turma atualizada'); V.turmas(); }catch(err){ toast(err.message,'bad'); } });
+  };
+
+  /* ---------- avisos ---------- */
+  V.avisos=async()=>{
+    const ts=await turmas(); const PUB={publico:'Site (todos)',responsaveis:'Famílias',equipe:'Equipe'};
+    async function render(){
+      const av=await api.todosAvisos();
+      main.innerHTML=topo('Avisos','Publique no site, para as famílias (todas ou de uma turma) ou só para a equipe')+`<div class="view split2">
+        <form class="card" id="avF" style="display:grid;gap:12px;align-content:start"><h3 style="font-size:22px">Novo aviso</h3><input type="hidden" id="avId">
+          <label class="field" for="avT">Título<input id="avT" maxlength="140" required></label>
+          <label class="field" for="avC">Texto<textarea id="avC" maxlength="4000" required></textarea></label>
+          <div class="grid2"><label class="field" for="avP">Quem vê<select id="avP"><option value="publico">Site (todos)</option><option value="responsaveis" selected>Famílias</option><option value="equipe">Equipe</option></select></label>
+            <label class="field" for="avTu">Turma<select id="avTu">${optTurmas(ts,'','Todas as famílias')}</select></label></div>
+          <label class="field" for="avFx" style="display:flex;gap:8px;align-items:center"><input id="avFx" type="checkbox" style="width:20px;height:20px"> Fixar no topo</label>
+          <div style="display:flex;gap:8px"><button class="btn btn-coral" type="submit">Publicar</button><button class="btn btn-soft" type="reset" id="avR">Limpar</button></div></form>
+        <div class="list">${av.length?av.map(a=>`<article class="item"><div class="row"><h3>${esc(a.titulo)}</h3><span style="display:flex;gap:6px;flex-wrap:wrap">${a.fixado?'<span class="pill coral">Fixado</span>':''}<span class="pill leaf">${PUB[a.publico]}</span>${a.turmas?`<span class="pill sea">${esc(a.turmas.nome)}</span>`:''}<span class="pill">${fmtData(a.created_at)}</span></span></div><p>${esc(a.corpo)}</p><div class="actions"><button class="iconbtn" data-ed="${a.id}">Editar</button><button class="iconbtn bad" data-rm="${a.id}">Remover</button></div></article>`).join(''):'<div class="empty"><b>Nenhum aviso publicado</b></div>'}</div></div>`;
+      const syncT=()=>{ $('#avTu').disabled=$('#avP').value!=='responsaveis'; }; $('#avP').onchange=syncT; syncT();
+      $('#avF').onsubmit=async e=>{ e.preventDefault(); const d={id:$('#avId').value||null,titulo:$('#avT').value.trim(),corpo:$('#avC').value.trim(),publico:$('#avP').value,turma_id:$('#avTu').value||null,fixado:$('#avFx').checked}; if(!d.titulo||!d.corpo){ toast('Preencha título e texto.','bad'); return; } try{ await api.salvarAviso(d); som.sucesso(); toast(d.id?'Aviso atualizado':'Aviso publicado'); render(); }catch(err){ toast(err.message,'bad'); } };
+      $('#avR').onclick=()=>{ $('#avId').value=''; setTimeout(syncT); };
+      document.querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>{ const a=av.find(x=>x.id===b.dataset.ed); $('#avId').value=a.id; $('#avT').value=a.titulo; $('#avC').value=a.corpo; $('#avP').value=a.publico; $('#avTu').value=a.turma_id||''; $('#avFx').checked=a.fixado; syncT(); $('#avT').focus(); });
+      document.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>confirmar('Remover este aviso?',async()=>{ await api.removerAviso(b.dataset.rm); toast('Aviso removido'); render(); },'Remover'));
+    }
+    main.innerHTML=topo('Avisos')+loading; render();
+  };
+
+  /* ---------- agenda ---------- */
+  V.agenda=async()=>{
+    async function render(){
+      const ev=await api.eventos(true);
+      main.innerHTML=topo('Agenda','Eventos mostrados no site e na Área do Responsável')+`<div class="view split2">
+        <form class="card" id="evF" style="display:grid;gap:12px;align-content:start"><h3 style="font-size:22px">Novo evento</h3><input type="hidden" id="evId"><label class="field" for="evT">Título<input id="evT" required></label><label class="field" for="evD">Data<input id="evD" type="date" required></label><label class="field" for="evX">Descrição<textarea id="evX" style="min-height:80px"></textarea></label><div style="display:flex;gap:8px"><button class="btn btn-coral" type="submit">Salvar</button><button class="btn btn-soft" type="reset" onclick="document.getElementById('evId').value=''">Limpar</button></div></form>
+        <div class="list">${ev.length?ev.map(e=>`<article class="item"><div class="row"><h3>${esc(e.titulo)}</h3><span class="pill ${e.data>=hojeISO()?'sun':''}">${fmtData(e.data)}</span></div>${e.descricao?`<p>${esc(e.descricao)}</p>`:''}<div class="actions"><button class="iconbtn" data-ed="${e.id}">Editar</button><button class="iconbtn bad" data-rm="${e.id}">Remover</button></div></article>`).join(''):'<div class="empty"><b>Agenda vazia</b></div>'}</div></div>`;
+      $('#evF').onsubmit=async e=>{ e.preventDefault(); const d={id:$('#evId').value||null,titulo:$('#evT').value.trim(),data:$('#evD').value,descricao:$('#evX').value.trim()}; if(!d.titulo||!d.data){ toast('Informe título e data.','bad'); return; } try{ await api.salvarEvento(d); toast('Evento salvo'); render(); }catch(err){ toast(err.message,'bad'); } };
+      document.querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>{ const x=ev.find(y=>y.id===b.dataset.ed); $('#evId').value=x.id; $('#evT').value=x.titulo; $('#evD').value=x.data; $('#evX').value=x.descricao||''; });
+      document.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>confirmar('Remover este evento?',async()=>{ await api.removerEvento(b.dataset.rm); toast('Evento removido'); render(); },'Remover'));
+    }
+    main.innerHTML=topo('Agenda')+loading; render();
+  };
+
+  /* ---------- mensagens ---------- */
+  V.contatos=async()=>{
+    main.innerHTML=topo('Mensagens do site')+loading;
+    const cs=await api.contatos(), cor={'novo':'coral','em atendimento':'sun','respondido':'ok'};
+    main.innerHTML=topo('Mensagens do site','Enviadas pelo formulário de contato')+`<div class="view"><div class="list">${cs.length?cs.map(c=>`<article class="item"><div class="row"><h3>${esc(c.nome)}</h3><span class="pill ${cor[c.status]}">${esc(c.status)}</span></div><div style="display:flex;flex-wrap:wrap;gap:6px"><span class="pill leaf">${esc(c.assunto)}</span><span class="pill">${fmtData(c.created_at)}</span></div><p>${esc(c.mensagem)}</p><p style="color:var(--ink)"><b>${esc(c.email)}</b>${c.telefone?' · '+esc(c.telefone):''}</p><div class="actions"><label class="sr" for="st-${c.id}">Situação</label><select id="st-${c.id}" data-st="${c.id}" style="width:auto;padding:8px 12px">${['novo','em atendimento','respondido'].map(s=>`<option ${s===c.status?'selected':''}>${s}</option>`).join('')}</select></div></article>`).join(''):'<div class="empty"><b>Nenhuma mensagem ainda</b></div>'}</div></div>`;
+    document.querySelectorAll('[data-st]').forEach(s=>s.onchange=async()=>{ try{ await api.statusContato(s.dataset.st,s.value); toast('Situação atualizada'); V.contatos(); }catch(err){ toast(err.message,'bad'); } });
+  };
+
+  /* ---------- convites ---------- */
+  V.convites=async()=>{
+    const papeis=pode(DIR)?['professor','funcionario','secretario','diretor','responsavel']:['professor','funcionario','responsavel'];
+    async function render(){
+      const cv=await api.convites();
+      main.innerHTML=topo('Convites de acesso','Cadastre o e-mail e o perfil antes da pessoa criar a conta')+`<div class="view split2">
+        <form class="card" id="cvF" style="display:grid;gap:12px;align-content:start"><h3 style="font-size:22px">Novo convite</h3><label class="field" for="cvE">E-mail<input id="cvE" type="email" required></label><label class="field" for="cvP">Perfil<select id="cvP">${papeis.map(p=>`<option value="${p}">${PAPEIS[p]}</option>`).join('')}</select></label>${pode(DIR)?'':'<p class="hint">Convites para Secretaria e Direção são feitos só pela direção.</p>'}<button class="btn btn-coral" type="submit" style="justify-self:start">Criar convite</button></form>
+        <div class="list">${cv.length?cv.map(c=>`<article class="item"><div class="row"><h3 style="font-size:17px;overflow-wrap:anywhere">${esc(c.email)}</h3><span class="pill leaf">${PAPEIS[c.papel]}</span></div><div class="row"><small class="muted">Aguardando cadastro desde ${fmtData(c.created_at)}</small><button class="iconbtn bad" data-rm="${esc(c.email)}">Cancelar</button></div></article>`).join(''):'<div class="empty"><b>Nenhum convite pendente</b></div>'}</div></div>`;
+      $('#cvF').onsubmit=async e=>{ e.preventDefault(); const em=$('#cvE').value.trim(); if(!/^\S+@\S+\.\S+$/.test(em)){ toast('E-mail inválido.','bad'); return; } try{ await api.criarConvite(em,$('#cvP').value); toast('Convite criado'); render(); }catch(err){ toast(err.message,'bad'); } };
+      document.querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{ try{ await api.removerConvite(b.dataset.rm); toast('Convite cancelado'); render(); }catch(err){ toast(err.message,'bad'); } });
+    }
+    main.innerHTML=topo('Convites de acesso')+loading; render();
+  };
+
+  /* ---------- permissões (direção) ---------- */
+  V.usuarios=async()=>{
+    main.innerHTML=topo('Equipe e permissões')+loading;
+    const ps=await api.perfis(); ps.sort((a,b)=>(a.papel==='pendente'?-1:0)-(b.papel==='pendente'?-1:0)||a.nome.localeCompare(b.nome));
+    const opts=['pendente','responsavel','funcionario','professor','secretario','diretor'];
+    main.innerHTML=topo('Equipe e permissões','Somente a direção altera perfis, bloqueia e exclui contas',`<span class="lock">🔒 Exclusivo da direção</span>`)+`<div class="view">
+      <div class="card" style="display:grid;gap:8px"><b>O que cada perfil pode fazer</b><div style="display:flex;flex-wrap:wrap;gap:6px"><span class="pill">Responsável: matrícula, diário, avisos e frequência dos filhos</span><span class="pill">Funcionário: ponto e avisos internos</span><span class="pill">Professora: + diário e chamada</span><span class="pill">Secretaria: + matrículas, crianças, turmas, avisos, agenda, mensagens</span><span class="pill coral">Direção: + permissões, exclusão de contas e relatório de ponto</span></div></div>
+      <div class="table-wrap"><table><thead><tr><th>Pessoa</th><th>Perfil</th><th>Situação</th></tr></thead><tbody>${ps.map(p=>`<tr ${p.papel==='pendente'?'style="background:var(--warn-bg)"':''}><td><div style="display:flex;gap:10px;align-items:center">${PV.avatar(p,34)}<div><b>${esc(p.nome)}</b><br><small class="muted">${esc(p.email||'')}</small></div></div></td>
+        <td><label class="sr" for="pp-${p.id}">Perfil de ${esc(p.nome)}</label><select id="pp-${p.id}" data-p="${p.id}" style="width:auto;padding:8px 12px" ${p.id===perfil.id?'disabled':''}>${opts.map(o=>`<option value="${o}" ${o===p.papel?'selected':''}>${PAPEIS[o]}</option>`).join('')}</select></td>
+        <td>${p.id===perfil.id?'<span class="pill ok">Você</span>':`<span class="actions" style="justify-content:flex-start"><button class="iconbtn ${p.ativo?'bad':''}" data-at="${p.id}" data-v="${p.ativo?0:1}">${p.ativo?'Bloquear':'Reativar'}</button><button class="iconbtn bad" data-ex="${p.id}">Excluir conta</button>${p.ativo?'':'<span class="pill bad">Bloqueado</span>'}</span>`}</td></tr>`).join('')}</tbody></table></div>
+      <p class="hint">Excluir apaga a conta de acesso. Bloquear só impede a entrada e pode ser desfeito.</p></div>`;
+    document.querySelectorAll('[data-p]').forEach(s=>s.onchange=()=>{ const p=ps.find(x=>x.id===s.dataset.p), novo=s.value; s.value=p.papel; confirmar(`Mudar <b>${esc(p.nome)}</b> para <b>${PAPEIS[novo]}</b>?`,async()=>{ await api.atualizarPerfil(p.id,{papel:novo}); toast('Perfil atualizado'); V.usuarios(); }); });
+    document.querySelectorAll('[data-at]').forEach(b=>b.onclick=()=>confirmar(b.dataset.v==='0'?'Bloquear esta conta? A pessoa perde o acesso até ser reativada.':'Reativar esta conta?',async()=>{ await api.atualizarPerfil(b.dataset.at,{ativo:b.dataset.v==='1'}); toast('Conta atualizada'); V.usuarios(); }));
+    document.querySelectorAll('[data-ex]').forEach(b=>b.onclick=()=>{ const p=ps.find(x=>x.id===b.dataset.ex); dialogo(`<h3 style="font-size:22px;color:var(--bad)">Excluir a conta de ${esc(p.nome)}?</h3><p class="muted">A pessoa perde o acesso. Ponto, diários e chamadas continuam no histórico. Não pode ser desfeito.</p><label class="field" for="exC">Digite EXCLUIR para confirmar<input id="exC" required autocomplete="off"></label>`,async f=>{ if(f.querySelector('#exC').value.trim().toUpperCase()!=='EXCLUIR') throw new Error('Digite EXCLUIR para confirmar.'); await api.excluirUsuario(p.id); toast('Conta excluída'); V.usuarios(); },'Excluir'); });
+  };
+
+  /* ---------- relatório de ponto ---------- */
+  V.relponto=async()=>{
+    let mes=mesAtual(), pessoa='';
+    async function render(){
+      const [ps,pf]=await Promise.all([api.pontos(...mesRange(mes),true),api.perfis()]);
+      const chave=p=>p.user_id||('ex:'+(p.nome_registro||''));
+      const nome=u=>u.startsWith('ex:')?(u.slice(3)||'Conta excluída')+' (conta excluída)':(pf.find(p=>p.id===u)||{}).nome||(ps.find(p=>p.user_id===u)||{}).nome_registro||'—';
+      const lista=ps.filter(p=>!pessoa||chave(p)===pessoa), g={}; lista.forEach(p=>{ const k=chave(p)+'|'+diaLocal(p.registrado_em); (g[k]=g[k]||[]).push(p); });
+      const pp={}; Object.entries(g).forEach(([k,a])=>{ const u=k.split('|')[0]; pp[u]=(pp[u]||0)+horasDoDia(a); });
+      const pessoas=[...new Set(ps.map(chave))];
+      const ls=Object.keys(g).sort((a,b)=>b.split('|')[1].localeCompare(a.split('|')[1])||nome(a.split('|')[0]).localeCompare(nome(b.split('|')[0])));
+      main.innerHTML=topo('Relatório de ponto','Horas por pessoa e por dia. Toque num horário para ajustar.',`<span class="lock">🔒 Exclusivo da direção</span>`)+`<div class="view">
+        <div class="toolbar card"><label class="field" for="rM" style="max-width:220px">Mês<input id="rM" type="month" value="${mes}"></label><label class="field" for="rP">Pessoa<select id="rP"><option value="">Toda a equipe</option>${pessoas.map(u=>`<option value="${esc(u)}" ${u===pessoa?'selected':''}>${esc(nome(u))}</option>`).join('')}</select></label></div>
+        <div class="stats">${Object.keys(pp).length?Object.entries(pp).sort((a,b)=>b[1]-a[1]).map(([u,h])=>`<div class="stat"><span class="v">${fmtHoras(h)}</span><span class="k">${esc(nome(u))}</span></div>`).join(''):'<div class="empty" style="grid-column:1/-1"><b>Nenhuma batida neste período</b></div>'}</div>
+        ${ls.length?`<div class="table-wrap"><table><thead><tr><th>Dia</th><th>Pessoa</th><th>Entrada</th><th>Saída int.</th><th>Volta int.</th><th>Saída</th><th class="num">Total</th></tr></thead><tbody>${ls.map(k=>{ const [u,d]=k.split('|'), a=g[k]; const c=t=>{ const x=a.filter(p=>p.tipo===t); return x.length?x.map(p=>`<button class="iconbtn" data-aj="${p.id}">${fmtHora(p.registrado_em)}${p.ajustado_por?' *':''}${p.observacao?' 💬':''}</button>`).join(' '):'<span class="muted">—</span>'; }; return `<tr><td><b>${new Date(d+'T12:00').toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})}</b></td><td>${esc(nome(u))}</td><td>${c('entrada')}</td><td>${c('saida_intervalo')}</td><td>${c('retorno_intervalo')}</td><td>${c('saida')}</td><td class="num"><b>${fmtHoras(horasDoDia(a))}</b></td></tr>`; }).join('')}</tbody></table></div><p class="hint">* ajustado pela direção · 💬 com observação</p>`:''}</div>`;
+      $('#rM').onchange=e=>{mes=e.target.value||mesAtual();render();}; $('#rP').onchange=e=>{pessoa=e.target.value;render();};
+      document.querySelectorAll('[data-aj]').forEach(b=>b.onclick=()=>{ const p=ps.find(x=>x.id===b.dataset.aj), loc=new Date(new Date(p.registrado_em).getTime()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,16);
+        dialogo(`<h3 style="font-size:22px">Ajustar batida</h3><p class="muted">${esc(nome(chave(p)))} · ${PONTO[p.tipo]}</p><label class="field" for="ajH">Data e hora<input id="ajH" type="datetime-local" value="${loc}" required></label><label class="field" for="ajO">Motivo do ajuste<input id="ajO" maxlength="300" value="${esc(p.observacao||'')}"></label><label class="field" for="ajR" style="display:flex;gap:8px;align-items:center"><input id="ajR" type="checkbox" style="width:18px;height:18px"> Apagar esta batida</label>`,
+          async f=>{ if(f.querySelector('#ajR').checked){ await api.removerPonto(p.id); toast('Batida removida'); } else { const v=f.querySelector('#ajH').value; if(!v) throw new Error('Informe a data e a hora.'); await api.ajustarPonto(p.id,new Date(v).toISOString(),f.querySelector('#ajO').value.trim()||null); toast('Batida ajustada'); } render(); },'Salvar'); });
+    }
+    main.innerHTML=topo('Relatório de ponto')+loading; render();
+  };
+
+  /* ---------- login / sessão ---------- */
+  function telas(n){ ['telaCarregando','telaLogin','telaSenha','telaApp'].forEach(t=>$('#'+t).hidden=t!==n); }
+  document.querySelectorAll('[data-modo]').forEach(b=>b.addEventListener('click',()=>{ modo=b.dataset.modo; document.querySelectorAll('[data-modo]').forEach(x=>x.setAttribute('aria-pressed',x===b)); $('#wNome').hidden=modo!=='criar'; $('#tLogin').textContent=$('#lBtn').textContent=modo==='criar'?'Criar conta':'Entrar'; $('#lMsg').className=''; $('#lMsg').textContent=''; }));
+  document.querySelectorAll('[data-papel]').forEach(b=>b.addEventListener('click',()=>api.entrarComo(b.dataset.papel)));
+  $('#fLogin').addEventListener('submit',async e=>{
+    e.preventDefault(); const m=$('#lMsg'), btn=$('#lBtn'), email=$('#lEmail').value.trim(), senha=$('#lSenha').value;
+    if(!/^\S+@\S+\.\S+$/.test(email)||senha.length<6){ m.className='msg bad'; m.textContent='Informe um e-mail válido e uma senha com pelo menos 6 caracteres.'; som.erro(); return; }
+    btn.disabled=true;
+    try{ if(modo==='criar'){ const nome=$('#lNome').value.trim(); if(nome.length<3) throw new Error('Informe seu nome completo.'); const r=await api.cadastrar({nome,email,senha,origem:'equipe'}); if(r.precisaConfirmar){ m.className='msg ok'; m.textContent='Conta criada! Confirme pelo link enviado para '+email+' e depois entre aqui.'; som.sucesso(); } } else await api.entrar(email,senha); }
+    catch(err){ m.className='msg bad'; m.textContent=err.message; som.erro(); }
+    btn.disabled=false;
+  });
+  $('#esqueci').addEventListener('click',async()=>{ const m=$('#lMsg'), email=$('#lEmail').value.trim(); if(!/^\S+@\S+\.\S+$/.test(email)){ m.className='msg warn'; m.textContent='Digite seu e-mail acima e toque de novo em “Esqueci minha senha”.'; return; } try{ await api.recuperar(email); m.className='msg ok'; m.textContent='Enviamos um link para redefinir a senha.'; }catch(err){ m.className='msg bad'; m.textContent=err.message; } });
+  $('#fSenha').addEventListener('submit',async e=>{ e.preventDefault(); try{ await api.novaSenha($('#nSenha').value); toast('Senha alterada'); iniciar(); }catch(err){ $('#nMsg').className='msg bad'; $('#nMsg').textContent=err.message; } });
+  $('#sair').addEventListener('click',()=>api.sair());
+
+  async function iniciar(){
+    clearInterval(relogio);
+    const s=await api.sessao(); ultimo=s&&s.user&&s.user.id;
+    if(!s){ telas('telaLogin'); return; }
+    perfil=await api.perfil(); telas('telaApp');
+    PV.montarMenuConta($('#acct'),api,perfil||null,{semArea:true});
+    $('#whoAv').innerHTML=PV.avatar(perfil,36); $('#whoNome').textContent=perfil?.nome||s.user.email; $('#whoPapel').textContent=perfil?PAPEIS[perfil.papel]:'';
+    if(!perfil||!perfil.ativo||!EQUIPE.includes(perfil.papel)){
+      $('#nav').innerHTML='';
+      const msg=!perfil?'Não encontramos seu perfil.':!perfil.ativo?'Sua conta está bloqueada. Fale com a direção.':perfil.papel==='responsavel'?'Esta é a área da equipe. Famílias usam a Área do Responsável.':'Sua conta foi criada e está aguardando a direção liberar o acesso.';
+      main.innerHTML=topo('Acesso restrito')+`<div class="view"><div class="empty"><b>${msg}</b>${perfil?.papel==='responsavel'?'<a class="btn btn-coral" href="responsavel.html" style="margin-top:8px">Ir para a Área do Responsável</a>':'Depois da liberação, saia e entre novamente.'}</div></div>`; return;
+    }
+    montarNav(); badgeMat();
+    let v='inicio'; try{ v=sessionStorage.getItem('pv-equipe-view')||'inicio'; }catch(e){}
+    ir(v);
+  }
+  api.onAuth(async ev=>{
+    if(ev==='PASSWORD_RECOVERY'){ telas('telaSenha'); return; }
+    if(ev==='SIGNED_OUT'){ try{ sessionStorage.removeItem('pv-equipe-view'); }catch(e){} ultimo=null; iniciar(); return; }
+    if(ev==='SIGNED_IN'){ const s=await api.sessao(); const u=s&&s.user&&s.user.id; if(u!==ultimo) iniciar(); }
+  });
+  try{ await iniciar(); }catch(err){ telas('telaLogin'); $('#lMsg').className='msg bad'; $('#lMsg').textContent='Não foi possível abrir sua sessão: '+err.message; }
+})();
+</script>
+</body>
+</html>

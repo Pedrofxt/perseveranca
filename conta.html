@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Minha conta · CEI Perseverança</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&family=Patrick+Hand&display=swap">
+<link rel="stylesheet" href="assets/pv.css">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.bar{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:50}
+.bar .wrap{display:flex;align-items:center;gap:12px;padding-block:10px}
+.bar .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);margin-right:auto}
+.bar .logo img{width:46px}
+.bar .logo b{font-family:var(--f-display);font-size:19px;line-height:1;display:block}
+.bar .logo small{font-size:12.5px;color:var(--muted)}
+.page{display:grid;grid-template-columns:240px 1fr;gap:26px;padding-block:28px 70px;align-items:start}
+.page>*{min-width:0}
+.toc{position:sticky;top:90px;display:grid;gap:4px}
+.toc a{display:flex;gap:10px;align-items:center;padding:11px 14px;border-radius:12px;text-decoration:none;color:var(--ink);font-weight:800;font-size:15px}
+.toc a:hover{background:var(--surface-2)}
+.toc a.perigo{color:var(--bad)}
+.sections{display:grid;gap:20px}
+.sec{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:clamp(20px,3vw,30px);display:grid;gap:18px;scroll-margin-top:90px;animation:viewIn .45s both}
+.sec h2{font-size:26px}
+.sec .sub{color:var(--muted);margin-top:-10px}
+.hero-card{background:var(--leaf);color:#fff;border-radius:22px;padding:26px;display:flex;flex-wrap:wrap;gap:20px;align-items:center;position:relative;overflow:hidden}
+.hero-card::after{content:"";position:absolute;right:-50px;top:-50px;width:190px;height:190px;border-radius:50%;background:var(--coral)}
+.hero-card>*{position:relative;z-index:1}
+.hero-card h1{font-size:clamp(26px,3.4vw,38px)}
+.hero-card .av{box-shadow:0 0 0 4px var(--leaf),0 0 0 7px var(--sun)}
+.foto-row{display:flex;flex-wrap:wrap;gap:22px;align-items:center}
+.foto-row .av{box-shadow:0 0 0 4px var(--surface),0 0 0 7px var(--sun);transition:transform .4s cubic-bezier(.3,1.6,.5,1)}
+.foto-row .av.pop{animation:pop .5s cubic-bezier(.3,1.8,.5,1)}
+@keyframes pop{0%{transform:scale(.8)}100%{transform:scale(1)}}
+.presets{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:12px}
+.preset{border:3px solid transparent;border-radius:50%;padding:3px;background:none;cursor:pointer;transition:transform .2s cubic-bezier(.3,1.6,.5,1),border-color .2s;justify-self:center}
+.preset:hover{transform:translateY(-3px) rotate(-6deg)}
+.preset[aria-pressed="true"]{border-color:var(--coral)}
+.preset .av{box-shadow:none}
+.ro{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.ro div{background:var(--surface-2);border-radius:14px;padding:12px 14px}
+.ro small{display:block;font-weight:800;letter-spacing:.06em;text-transform:uppercase;font-size:11.5px;color:var(--muted)}
+.ro b{overflow-wrap:anywhere}
+.sec.danger{border:2px solid var(--bad)}
+.sec.danger h2{color:var(--bad)}
+.danger ul{margin:0;padding-left:20px;color:var(--muted);display:grid;gap:4px}
+.btn-bad{background:var(--bad);color:#fff}
+.strength{height:6px;border-radius:6px;background:var(--surface-2);overflow:hidden}
+.strength i{display:block;height:100%;width:0;border-radius:6px;transition:width .3s,background .3s}
+@media (max-width:860px){.page{grid-template-columns:1fr}.toc{position:static;display:flex;overflow-x:auto;gap:6px}.toc a{white-space:nowrap;background:var(--surface);border:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<div id="demoBar" class="demo-bar" hidden>Modo demonstração: as alterações valem só nesta página. No site publicado, ficam salvas no Supabase.</div>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="logo" href="index.html"><img src="assets/logo.svg" alt=""><span><b>CEI Perseverança</b><small>Configurações da conta</small></span></a>
+    <button class="icon-toggle sound-toggle" type="button"></button><button class="icon-toggle theme-toggle" type="button"></button>
+    <div class="acct" id="acct"></div>
+  </div>
+</header>
+
+<div id="telaCarregando" style="min-height:60vh;display:grid;place-items:center;align-content:center;gap:12px;text-align:center">
+  <img src="assets/logo.svg" alt="" style="width:110px;margin:auto;animation:float 2s ease-in-out infinite">
+  <p class="muted" style="font-weight:700">Carregando…</p>
+</div>
+
+<main class="wrap" id="telaFora" hidden style="padding-block:60px">
+  <div class="empty" style="max-width:560px;margin:auto">
+    <b>Entre para ver as configurações da sua conta</b>
+    Use a mesma conta da Área do Responsável ou da Área da Equipe.
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px">
+      <a class="btn btn-coral" href="responsavel.html">Área do Responsável</a>
+      <a class="btn btn-leaf" href="equipe.html">Área da Equipe</a>
+    </div>
+    <div id="demoEntrar" hidden style="display:grid;gap:8px;margin-top:16px;width:100%">
+      <p>Na demonstração, entre com uma conta de exemplo:</p>
+      <div class="demo-roles"><button class="btn btn-soft btn-sm" data-papel="responsavel">Responsável</button><button class="btn btn-soft btn-sm" data-papel="professor">Professor(a)</button><button class="btn btn-soft btn-sm" data-papel="secretario">Secretaria</button><button class="btn btn-soft btn-sm" data-papel="diretor">Direção</button></div>
+    </div>
+  </div>
+</main>
+
+<main class="wrap page" id="telaConta" hidden>
+  <nav class="toc" aria-label="Seções">
+    <a href="#perfil">Foto e nome</a>
+    <a href="#dados">Dados da conta</a>
+    <a href="#seguranca">Senha</a>
+    <a href="#excluir" class="perigo">Excluir conta</a>
+  </nav>
+  <div class="sections">
+    <div class="hero-card" id="heroCard"></div>
+
+    <section class="sec" id="perfil">
+      <h2>Foto e nome</h2>
+      <p class="sub">Aparecem no canto superior direito do site e para a equipe da escola.</p>
+      <div class="foto-row">
+        <span id="fotoPrev"></span>
+        <div style="display:grid;gap:10px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <label class="btn btn-leaf" for="fotoArq" style="cursor:pointer">Enviar foto</label>
+            <input id="fotoArq" type="file" accept="image/jpeg,image/png,image/webp" class="sr">
+            <button class="btn btn-soft" type="button" id="fotoRem">Remover foto</button>
+          </div>
+          <span class="hint muted" style="font-size:13.5px">JPG, PNG ou WebP. A imagem é recortada em quadrado e reduzida antes do envio.</span>
+        </div>
+      </div>
+      <div style="display:grid;gap:10px">
+        <b>Ou escolha um avatar</b>
+        <div class="presets" id="presets"></div>
+      </div>
+      <form id="fPerfil" style="display:grid;gap:14px">
+        <div class="grid2">
+          <label class="field" for="pNome">Nome completo<input id="pNome" required maxlength="120" autocomplete="name"></label>
+          <label class="field" for="pTel">Telefone<input id="pTel" type="tel" maxlength="40" autocomplete="tel" placeholder="(41) 9 0000-0000"></label>
+        </div>
+        <button class="btn btn-coral" type="submit" style="justify-self:start">Salvar nome e telefone</button>
+      </form>
+    </section>
+
+    <section class="sec" id="dados">
+      <h2>Dados da conta</h2>
+      <div class="ro" id="dadosRO"></div>
+      <form id="fEmail" style="display:grid;gap:12px">
+        <label class="field" for="eNovo">Trocar e-mail de acesso<input id="eNovo" type="email" required autocomplete="email" placeholder="novo@email.com"></label>
+        <p class="muted" style="font-size:14px">Enviaremos um link de confirmação para o novo e-mail (e um aviso para o atual). A troca só vale depois que o link for aberto.</p>
+        <button class="btn btn-soft" type="submit" style="justify-self:start">Trocar e-mail</button>
+      </form>
+    </section>
+
+    <section class="sec" id="seguranca">
+      <h2>Senha</h2>
+      <form id="fSenha" style="display:grid;gap:14px">
+        <label class="field" for="sAtual">Senha atual<input id="sAtual" type="password" required autocomplete="current-password"></label>
+        <div class="grid2">
+          <label class="field" for="sNova">Nova senha<input id="sNova" type="password" required minlength="8" autocomplete="new-password"></label>
+          <label class="field" for="sConf">Repita a nova senha<input id="sConf" type="password" required minlength="8" autocomplete="new-password"></label>
+        </div>
+        <div class="strength" aria-hidden="true"><i id="forca"></i></div>
+        <span class="muted" style="font-size:13.5px" id="forcaTxt">Use pelo menos 8 caracteres, misturando letras e números.</span>
+        <button class="btn btn-coral" type="submit" style="justify-self:start">Alterar senha</button>
+      </form>
+    </section>
+
+    <section class="sec danger" id="excluir">
+      <h2>Excluir conta</h2>
+      <div style="display:grid;gap:8px">
+        <b>O que acontece ao excluir</b>
+        <ul id="excluirLista"></ul>
+      </div>
+      <form id="fExcluir" style="display:grid;gap:14px">
+        <div class="grid2">
+          <label class="field" for="xConf">Digite EXCLUIR para confirmar<input id="xConf" required autocomplete="off"></label>
+          <label class="field" for="xSenha">Sua senha<input id="xSenha" type="password" required autocomplete="current-password"></label>
+        </div>
+        <div id="xMsg" role="status" aria-live="polite"></div>
+        <button class="btn btn-bad" type="submit" style="justify-self:start">Excluir minha conta</button>
+      </form>
+    </section>
+  </div>
+</main>
+
+<dialog id="dlg" style="border:0;border-radius:20px;padding:0;background:var(--surface);color:var(--ink);width:min(440px,calc(100vw - 32px))"><form method="dialog" style="padding:24px;display:grid;gap:14px"><h3 style="font-size:22px;color:var(--bad)">Excluir a conta de vez?</h3><p class="muted">Essa ação não pode ser desfeita.</p><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-soft btn-sm" value="cancel">Cancelar</button><button class="btn btn-bad btn-sm" value="ok">Sim, excluir</button></div></form></dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/pv.js"></script>
+<script>
+(async function(){
+  const {esc,toast,avatar,AVATARES,PAPEIS,fmtData,som}=PV;
+  const $=s=>document.querySelector(s);
+  const api=await PV.conectar();
+  if(api.demo){ $('#demoBar').hidden=false; $('#demoEntrar').hidden=false; }
+  let perfil=null, ultimo=null;
+  const telas=n=>['telaCarregando','telaFora','telaConta'].forEach(t=>$('#'+t).hidden=t!==n);
+  document.querySelectorAll('[data-papel]').forEach(b=>b.addEventListener('click',()=>api.entrarComo(b.dataset.papel)));
+
+  async function menu(){ await PV.montarMenuConta($('#acct'),api,perfil,{aoSair:()=>{ location.href='index.html'; }}); }
+  function desenharFoto(pop){
+    $('#fotoPrev').innerHTML=avatar(perfil,120); if(pop){ const a=$('#fotoPrev .av'); a.classList.add('pop'); }
+    $('#heroCard').innerHTML=`${avatar(perfil,84)}<div style="display:grid;gap:6px"><span class="label">Minha conta</span><h1>${esc(perfil.nome)}</h1><span class="pill sun" style="justify-self:start">${PAPEIS[perfil.papel]}</span></div>`;
+    document.querySelectorAll('.preset').forEach(b=>b.setAttribute('aria-pressed',perfil.avatar_url==='preset:'+b.dataset.k));
+    menu();
+  }
+
+  async function iniciar(){
+    const s=await api.sessao(); ultimo=s&&s.user&&s.user.id;
+    if(!s){ perfil=null; telas('telaFora'); menu(); return; }
+    perfil=await api.perfil();
+    if(!perfil){ telas('telaFora'); return; }
+    const email=await api.email();
+    let filhos=[]; if(perfil.papel==='responsavel'){ try{ filhos=await api.minhasCriancas(); }catch(e){} }
+    telas('telaConta');
+    $('#presets').innerHTML=Object.keys(AVATARES).map(k=>`<button type="button" class="preset" data-k="${k}" aria-label="Avatar ${k}" aria-pressed="false">${avatar({avatar_url:'preset:'+k},58)}</button>`).join('');
+    $('#pNome').value=perfil.nome||''; $('#pTel').value=perfil.telefone||'';
+    $('#dadosRO').innerHTML=[['E-mail de acesso',esc(email)],['Perfil',PAPEIS[perfil.papel]],['Conta criada em',perfil.created_at?fmtData(perfil.created_at):'—'],...(filhos.length?[['Crianças vinculadas',filhos.map(f=>esc(f.nome.split(' ')[0])+' ('+esc(f.turmas?.nome||'sem turma')+')').join(', ')]]:[])].map(([k,v])=>`<div><small>${k}</small><b>${v}</b></div>`).join('');
+    const souUnicaDirecao=perfil.papel==='diretor';
+    $('#excluirLista').innerHTML=[
+      'Sua conta, sua foto e seu acesso ao site são apagados.',
+      filhos.length?'As crianças continuam matriculadas no CEI. A secretaria pode vincular outra conta de responsável a elas.':'',
+      PV.EQUIPE.includes(perfil.papel)?'Os registros de ponto, diários e chamadas que você lançou ficam guardados no histórico do CEI.':'',
+      souUnicaDirecao?'Se você for a única conta da Direção, passe esse perfil para outra pessoa antes.':'',
+      'Para voltar a usar o site, será preciso criar uma conta nova.'
+    ].filter(Boolean).map(t=>`<li>${t}</li>`).join('');
+    desenharFoto(false);
+
+    document.querySelectorAll('.preset').forEach(b=>b.onclick=async()=>{ try{ await api.limparAvatares().catch(()=>{}); await api.salvarPerfil({avatar_url:'preset:'+b.dataset.k}); perfil.avatar_url='preset:'+b.dataset.k; desenharFoto(true); toast('Avatar atualizado'); }catch(err){ toast(err.message,'bad'); } });
+  }
+
+  // foto: recorta em quadrado e reduz para 320px antes de enviar
+  function reduzir(arq){ return new Promise((res,rej)=>{ const img=new Image(); img.onload=()=>{ const lado=Math.min(img.width,img.height), c=document.createElement('canvas'); c.width=c.height=320; const x=c.getContext('2d'); x.drawImage(img,(img.width-lado)/2,(img.height-lado)/2,lado,lado,0,0,320,320); URL.revokeObjectURL(img.src); c.toBlob(b=>b?res(b):rej(new Error('Não foi possível processar a imagem.')),'image/jpeg',.86); }; img.onerror=()=>rej(new Error('Arquivo de imagem inválido.')); img.src=URL.createObjectURL(arq); }); }
+  $('#fotoArq').addEventListener('change',async e=>{
+    const f=e.target.files[0]; e.target.value=''; if(!f) return;
+    if(!/^image\/(jpeg|png|webp)$/.test(f.type)){ toast('Use uma imagem JPG, PNG ou WebP.','bad'); return; }
+    if(f.size>15*1024*1024){ toast('Imagem muito grande. Escolha uma com menos de 15 MB.','bad'); return; }
+    try{ toast('Enviando foto…'); const blob=await reduzir(f); perfil.avatar_url=await api.enviarAvatar(blob); desenharFoto(true); toast('Foto atualizada'); }catch(err){ toast(err.message,'bad'); }
+  });
+  $('#fotoRem').addEventListener('click',async()=>{ try{ await api.limparAvatares().catch(()=>{}); await api.salvarPerfil({avatar_url:null}); perfil.avatar_url=null; desenharFoto(true); toast('Foto removida'); }catch(err){ toast(err.message,'bad'); } });
+
+  $('#fPerfil').addEventListener('submit',async e=>{ e.preventDefault(); const nome=$('#pNome').value.trim(), tel=$('#pTel').value.trim();
+    if(nome.length<3){ toast('Informe o nome completo.','bad'); return; }
+    try{ await api.salvarPerfil({nome,telefone:tel||null}); perfil.nome=nome; perfil.telefone=tel; desenharFoto(false); toast('Dados salvos'); }catch(err){ toast(err.message,'bad'); } });
+
+  $('#fEmail').addEventListener('submit',async e=>{ e.preventDefault(); const em=$('#eNovo').value.trim();
+    if(!/^\S+@\S+\.\S+$/.test(em)){ toast('Informe um e-mail válido.','bad'); return; }
+    try{ await api.trocarEmail(em); toast('Enviamos um link de confirmação para '+em); $('#eNovo').value=''; }catch(err){ toast(err.message,'bad'); } });
+
+  const forca=v=>{ let p=0; if(v.length>=8)p++; if(v.length>=12)p++; if(/[A-Z]/.test(v)&&/[a-z]/.test(v))p++; if(/\d/.test(v))p++; if(/[^A-Za-z0-9]/.test(v))p++; return p; };
+  $('#sNova').addEventListener('input',e=>{ const p=forca(e.target.value), cores=['var(--bad)','var(--bad)','var(--sun)','var(--sun)','var(--ok)','var(--ok)'], txt=['Muito fraca','Fraca','Razoável','Boa','Forte','Muito forte']; $('#forca').style.width=(p/5*100)+'%'; $('#forca').style.background=cores[p]; $('#forcaTxt').textContent=e.target.value?'Força da senha: '+txt[p]:'Use pelo menos 8 caracteres, misturando letras e números.'; });
+  $('#fSenha').addEventListener('submit',async e=>{ e.preventDefault(); const a=$('#sAtual').value, n=$('#sNova').value, c=$('#sConf').value;
+    if(n.length<8){ toast('A nova senha precisa ter pelo menos 8 caracteres.','bad'); return; }
+    if(n!==c){ toast('As duas senhas novas não são iguais.','bad'); return; }
+    if(n===a){ toast('A nova senha precisa ser diferente da atual.','bad'); return; }
+    try{ await api.trocarSenha(a,n); e.target.reset(); $('#forca').style.width='0'; toast('Senha alterada'); }catch(err){ toast(err.message,'bad'); } });
+
+  $('#fExcluir').addEventListener('submit',e=>{ e.preventDefault(); const m=$('#xMsg');
+    if($('#xConf').value.trim().toUpperCase()!=='EXCLUIR'){ m.className='msg bad'; m.textContent='Digite EXCLUIR no primeiro campo para confirmar.'; return; }
+    if(!$('#xSenha').value){ m.className='msg bad'; m.textContent='Digite sua senha.'; return; }
+    const d=$('#dlg'); d.returnValue=''; d.showModal();
+    d.onclose=async()=>{ if(d.returnValue!=='ok') return; m.className='msg warn'; m.textContent='Excluindo sua conta…';
+      try{ await api.excluirConta($('#xSenha').value); try{ sessionStorage.setItem('pv-conta-excluida','1'); }catch(e){} location.href='index.html'; }
+      catch(err){ m.className='msg bad'; m.textContent=err.message; } };
+  });
+
+  api.onAuth(async ev=>{ if(ev==='SIGNED_OUT'){ ultimo=null; iniciar(); } else if(ev==='SIGNED_IN'){ const s=await api.sessao(); const u=s&&s.user&&s.user.id; if(u!==ultimo) iniciar(); } });
+  try{ await iniciar(); }catch(err){ telas('telaFora'); toast(err.message,'bad'); }
+})();
+</script>
+</body>
+</html>
