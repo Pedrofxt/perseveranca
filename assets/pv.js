@@ -5,7 +5,9 @@
 
   /* ================= tema ================= */
   function lerLS(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
-  function gravarLS(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  const PREF = ["pv-tema", "pv-som"];
+  function consentimento() { return lerLS("pv-cookies"); }
+  function gravarLS(k, v) { if (PREF.includes(k) && consentimento() !== "todos") return; try { localStorage.setItem(k, v); } catch (e) {} }
   let tema = lerLS("pv-tema");
   if (tema !== "light" && tema !== "dark") tema = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   root.setAttribute("data-theme", tema);
@@ -122,6 +124,9 @@
     if (/not confirmed/i.test(m)) return "Confirme seu e-mail pelo link que enviamos antes de entrar.";
     if (/already registered|already been registered/i.test(m)) return "Já existe uma conta com este e-mail. Use “Entrar”.";
     if (/Password should be/i.test(m)) return "A senha precisa ter pelo menos 6 caracteres.";
+    if (/LOCAL_OBRIGATORIO/.test(m)) return "A Direção exige a localização para bater o ponto. Permita o acesso à localização e tente de novo.";
+    if (/conta de responsável não pode virar/.test(m)) return m.replace(/^.*?Uma conta/,"Uma conta");
+    if (/CADASTRO_NAO_AUTORIZADO|Database error saving new user/i.test(m)) return "Este e-mail não foi liberado pela Direção para a Área da Equipe. Peça à Direção para cadastrar seu e-mail.";
     if (/row-level security|permission denied/i.test(m)) return "Seu perfil não tem permissão para esta ação.";
     if (/duplicate key/i.test(m)) return "Já existe um registro igual a este.";
     if (/rate limit/i.test(m)) return "Muitas tentativas seguidas. Aguarde um minuto e tente de novo.";
@@ -139,7 +144,13 @@
       async sessao() { return (await sb.auth.getSession()).data.session; },
       onAuth(cb) { sb.auth.onAuthStateChange((ev, s) => { setTimeout(() => cb(ev, s), 0); }); },
       async entrar(email, senha) { chk(await sb.auth.signInWithPassword({ email, password: senha })); },
-      async cadastrar(d) { const r = chk(await sb.auth.signUp({ email: d.email, password: d.senha, options: { data: { nome: d.nome, telefone: d.telefone || "", origem: d.origem || "" }, emailRedirectTo: volta() } })); return { precisaConfirmar: !r.session }; },
+      async cadastrar(d) {
+        const r = chk(await sb.auth.signUp({ email: d.email, password: d.senha, options: { data: { nome: d.nome, telefone: d.telefone || "", origem: d.origem || "", aceite: d.aceite ? "sim" : "" }, emailRedirectTo: volta() } }));
+        if (r.session) return { precisaConfirmar: false };
+        const e = await sb.auth.signInWithPassword({ email: d.email, password: d.senha }); // conta já confirmada automaticamente pelo banco
+        return { precisaConfirmar: !!e.error };
+      },
+      async podeCadastrarEquipe(email) { try { return chk(await sb.rpc("pode_cadastrar_equipe", { p_email: email })); } catch (e) { return "desconhecido"; } },
       async recuperar(email) { chk(await sb.auth.resetPasswordForEmail(email, { redirectTo: volta() })); },
       async novaSenha(s) { chk(await sb.auth.updateUser({ password: s })); },
       async sair() { await sb.auth.signOut(); },
@@ -158,7 +169,34 @@
       async statusContato(id, status) { chk(await sb.from("contatos").update({ status }).eq("id", id)); },
       async vagasTurmas() { return chk(await sb.rpc("vagas_turmas")); },
 
-      async minhasCriancas() { const id = await uid(); return chk(await sb.from("criancas").select("*, turmas(nome,faixa)").eq("responsavel_id", id).eq("ativo", true).order("nome")); },
+      async siteImagens() { try { return chk(await sb.from("site_imagens").select("*").order("local").order("ordem").order("created_at")); } catch (e) { return []; } },
+      async enviarImagemSite(blob, d) {
+        const caminho = d.local + "/" + Date.now() + "-" + Math.random().toString(36).slice(2, 7) + ".jpg";
+        chk(await sb.storage.from("site").upload(caminho, blob, { contentType: "image/jpeg" }));
+        const url = sb.storage.from("site").getPublicUrl(caminho).data.publicUrl;
+        if (d.local !== "galeria") { const velhas = chk(await sb.from("site_imagens").select("id,caminho").eq("local", d.local)); for (const v of velhas) await this.removerImagemSite(v.id, v.caminho); }
+        chk(await sb.from("site_imagens").insert({ local: d.local, titulo: d.titulo || null, legenda: d.legenda || null, url, caminho, ordem: d.ordem || 0 }));
+      },
+      async atualizarImagemSite(id, patch) { chk(await sb.from("site_imagens").update(patch).eq("id", id)); },
+      async removerImagemSite(id, caminho) { chk(await sb.from("site_imagens").delete().eq("id", id)); await sb.storage.from("site").remove([caminho]).catch(() => {}); },
+
+      async fotos(filtro) {
+        let q = sb.from("fotos").select("*, turmas(nome), criancas(nome)").order("data", { ascending: false }).order("created_at", { ascending: false }).limit(filtro && filtro.limite || 120);
+        if (filtro && filtro.turma_id) q = q.eq("turma_id", filtro.turma_id);
+        const l = chk(await q); if (!l.length) return l;
+        const ass = await sb.storage.from("fotos-criancas").createSignedUrls(l.map(f => f.caminho), 3600);
+        const m = {}; (ass.data || []).forEach(x => { if (x.signedUrl) m[x.path] = x.signedUrl; });
+        return l.map(f => ({ ...f, url: m[f.caminho] || null }));
+      },
+      async enviarFoto(blob, d) {
+        const caminho = d.turma_id + "/" + (crypto.randomUUID ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(36).slice(2)) + ".jpg";
+        chk(await sb.storage.from("fotos-criancas").upload(caminho, blob, { contentType: "image/jpeg" }));
+        const r = await sb.from("fotos").insert({ turma_id: d.turma_id, crianca_id: d.crianca_id || null, legenda: d.legenda || null, data: d.data, caminho });
+        if (r.error) { await sb.storage.from("fotos-criancas").remove([caminho]).catch(() => {}); throw new Error(traduzErro(r.error)); }
+      },
+      async removerFoto(id, caminho) { chk(await sb.from("fotos").delete().eq("id", id)); await sb.storage.from("fotos-criancas").remove([caminho]).catch(() => {}); },
+
+      async minhasCriancas() { const id = await uid(); return chk(await sb.from("criancas").select("*, turmas(nome,faixa)").or(`responsavel_id.eq.${id},responsavel2_id.eq.${id}`).eq("ativo", true).order("nome")); },
       async meusPedidos() { const id = await uid(); return chk(await sb.from("matriculas").select("*, turmas(nome)").eq("responsavel_id", id).order("created_at", { ascending: false })); },
       async pedirMatricula(d) { chk(await sb.from("matriculas").insert(d)); },
       async cancelarPedido(id) { chk(await sb.from("matriculas").update({ status: "cancelada" }).eq("id", id)); },
@@ -168,10 +206,19 @@
 
       async turmas() { return chk(await sb.from("turmas").select("*").order("ordem")); },
       async salvarTurma(t) { chk(await sb.from("turmas").update({ vagas: t.vagas, faixa: t.faixa }).eq("id", t.id)); },
-      async criancas(turmaId) { let q = sb.from("criancas").select("*, turmas(nome), resp:profiles!criancas_responsavel_id_fkey(nome,email)").eq("ativo", true).order("nome"); if (turmaId) q = q.eq("turma_id", turmaId); return chk(await q); },
-      async salvarCrianca(c) { const d = { nome: c.nome, data_nascimento: c.data_nascimento || null, turma_id: c.turma_id || null, turno: c.turno, responsavel_nome: c.responsavel_nome || null, responsavel_telefone: c.responsavel_telefone || null, observacoes: c.observacoes || null }; chk(c.id ? await sb.from("criancas").update(d).eq("id", c.id) : await sb.from("criancas").insert(d)); },
+      async criancas(turmaId) { let q = sb.from("criancas").select("*, turmas(nome), resp:profiles!criancas_responsavel_id_fkey(nome,email), resp2:profiles!criancas_responsavel2_id_fkey(nome,email)").eq("ativo", true).order("nome"); if (turmaId) q = q.eq("turma_id", turmaId); return chk(await q); },
+      async salvarCrianca(c) { const d = { nome: c.nome, data_nascimento: c.data_nascimento || null, turma_id: c.turma_id || null, turno: c.turno, responsavel_nome: c.responsavel_nome || null, responsavel_telefone: c.responsavel_telefone || null, responsavel_email: (c.responsavel_email || "").toLowerCase().trim() || null, responsavel2_nome: c.responsavel2_nome || null, responsavel2_email: (c.responsavel2_email || "").toLowerCase().trim() || null, observacoes: c.observacoes || null }; chk(c.id ? await sb.from("criancas").update(d).eq("id", c.id) : await sb.from("criancas").insert(d)); },
       async desligarCrianca(id) { chk(await sb.from("criancas").update({ ativo: false }).eq("id", id)); },
-      async vincularResponsavel(cid, email) { return chk(await sb.rpc("vincular_responsavel", { p_crianca: cid, p_email: email })); },
+      async vincularResponsavel(cid, email, slot) { return chk(await sb.rpc("vincular_responsavel", { p_crianca: cid, p_email: email, p_slot: slot || 1 })); },
+      async cardapio(desde, ate) { return chk(await sb.from("cardapio").select("*").gte("data", desde).lte("data", ate).order("data")); },
+      async salvarCardapio(linhas, apagar) {
+        if (linhas.length) chk(await sb.from("cardapio").upsert(linhas.map(l => ({ ...l, atualizado_em: new Date().toISOString() })), { onConflict: "data,refeicao" }));
+        for (const a of apagar || []) chk(await sb.from("cardapio").delete().eq("data", a.data).eq("refeicao", a.refeicao));
+      },
+      async minhasSolicitacoes() { const id = await uid(); return chk(await sb.from("solicitacoes").select("*, criancas(nome)").eq("responsavel_id", id).order("created_at", { ascending: false })); },
+      async pedirAlteracao(d) { chk(await sb.from("solicitacoes").insert({ crianca_id: d.crianca_id || null, tipo: d.tipo, detalhes: d.detalhes })); },
+      async solicitacoes() { return chk(await sb.from("solicitacoes").select("*, criancas(nome)").order("created_at", { ascending: false })); },
+      async responderSolicitacao(id, patch) { chk(await sb.from("solicitacoes").update(patch).eq("id", id)); },
       async matriculas() { return chk(await sb.from("matriculas").select("*, turmas(nome)").order("created_at", { ascending: false })); },
       async atualizarMatricula(id, patch) { chk(await sb.from("matriculas").update(patch).eq("id", id)); },
       async aprovarMatricula(id, turma, resposta) { return chk(await sb.rpc("aprovar_matricula", { p_id: id, p_turma: turma || null, p_resposta: resposta || "" })); },
@@ -180,7 +227,9 @@
       async diariosTurma(ids, data) { if (!ids.length) return []; return chk(await sb.from("diarios").select("*").in("crianca_id", ids).eq("data", data)); },
       async salvarDiario(d) { chk(await sb.from("diarios").upsert(d, { onConflict: "crianca_id,data" })); },
 
-      async baterPonto(tipo, observacao) { chk(await sb.from("pontos").insert({ tipo, observacao: observacao || null })); },
+      async baterPonto(tipo, observacao, geo) { const r = chk(await sb.from("pontos").insert({ tipo, observacao: observacao || null, latitude: geo ? geo.lat : null, longitude: geo ? geo.lng : null, precisao_m: geo ? Math.round(geo.acc) : null }).select("distancia_m").single()); return r; },
+      async configPonto() { try { const r = chk(await sb.from("configuracoes").select("valor").eq("chave", "ponto").maybeSingle()); return Object.assign({ usar: true, exigir: false, raio: 150, lat: null, lng: null }, r ? r.valor : {}); } catch (e) { return { usar: true, exigir: false, raio: 150, lat: null, lng: null }; } },
+      async salvarConfigPonto(v) { chk(await sb.from("configuracoes").upsert({ chave: "ponto", valor: v, atualizado_em: new Date().toISOString() })); },
       async pontos(desde, ate, todos) { let q = sb.from("pontos").select("*").gte("registrado_em", desde).lt("registrado_em", ate).order("registrado_em"); if (!todos) q = q.eq("user_id", await uid()); return chk(await q); },
       async ajustarPonto(id, iso, obs) { chk(await sb.from("pontos").update({ registrado_em: iso, observacao: obs }).eq("id", id)); },
       async removerPonto(id) { chk(await sb.from("pontos").delete().eq("id", id)); },
@@ -247,6 +296,15 @@
     const pontos = [];
     ["u-professor", "u-funcionario", "u-secretario"].forEach((u, ui) => { for (let k = 1; k <= 8; k++) { const d = new Date(); d.setDate(d.getDate() - k); if (d.getDay() === 0 || d.getDay() === 6) continue; const at = (h, m) => { const x = new Date(d); x.setHours(h, m + ui * 4, 0, 0); return x.toISOString(); }; const nome = perfis.find(p => p.id === u).nome; [["entrada", 7, 1], ["saida_intervalo", 11, 30], ["retorno_intervalo", 12, 30], ["saida", 16, 4 + k]].forEach(([t, h, m]) => pontos.push({ id: nid(), user_id: u, nome_registro: nome, tipo: t, registrado_em: at(h, m) })); } });
     const convites = [];
+    const paraURL = blob => new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(blob); });
+    const ilustra = (cor, txt) => "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="${cor}"/><circle cx="320" cy="70" r="36" fill="#FFC233"/><path d="M0 230 Q 100 190 200 230 T 400 225 V300 H0Z" fill="#fff" opacity=".35"/><circle cx="150" cy="170" r="30" fill="#fff" opacity=".9"/><circle cx="230" cy="180" r="24" fill="#fff" opacity=".8"/><text x="200" y="285" text-anchor="middle" font-family="sans-serif" font-size="20" fill="#fff">${txt}</text></svg>`);
+    const fotos = [["Pintura com tinta guache", 1, true], ["Roda de música", 2, false], ["Brincadeira no pátio", 3, true], ["Hora do lanche", 6, false], ["Plantio do feijão", 8, false]].map(([l, d, kid], i) => ({ id: nid(), turma_id: turmas[2].id, crianca_id: kid ? criancas[0].id : null, legenda: l + " (exemplo)", data: dias(-d), caminho: nid(), url: ilustra(["#F16C6C", "#3F3A64", "#CC3366", "#6C63A8", "#F05C5C"][i], "Foto de exemplo"), autor_nome: "Professora (exemplo)", created_at: agora() }));
+    const siteImgs = [];
+    const cfgPonto = { usar: true, exigir: false, raio: 150, lat: -25.5163, lng: -48.5228 };
+    criancas[0].responsavel_email = "familia@exemplo.com"; criancas[0].responsavel2_email = "segundo@exemplo.com"; criancas[0].responsavel2_nome = "Segundo responsável (exemplo)";
+    const REF = ["Café da manhã", "Almoço", "Lanche da tarde"], PRATOS = [["Leite com achocolatado e pão integral", "Arroz, feijão, frango ensopado e salada de cenoura", "Banana com aveia"], ["Iogurte natural e frutas picadas", "Arroz, lentilha, carne moída com legumes e beterraba", "Bolo de laranja e suco natural"], ["Mingau de aveia", "Macarrão com molho de tomate, peixe assado e brócolis", "Maçã e biscoito de polvilho"], ["Vitamina de mamão e pão com queijo", "Arroz, feijão, omelete e abobrinha refogada", "Pipoca caseira e suco de uva"], ["Leite e cuscuz com ovo", "Arroz, feijão, frango assado e purê de batata", "Melancia e torrada"]];
+    const cardapioL = []; (() => { const d = new Date(); const seg = new Date(d); seg.setDate(d.getDate() - ((d.getDay() + 6) % 7)); for (let i = 0; i < 5; i++) { const x = new Date(seg); x.setDate(seg.getDate() + i); REF.forEach((r, k) => cardapioL.push({ id: nid(), data: isoLocal(x), refeicao: r, descricao: PRATOS[i][k] + " (exemplo)" })); } })();
+    const solic = [{ id: nid(), responsavel_id: "u-resp", responsavel_nome: "Responsável (exemplo)", crianca_id: criancas[0].id, tipo: "Telefone", detalhes: "Novo telefone: (41) 9 0000-1234 (exemplo)", status: "em andamento", resposta: "Recebemos, vamos atualizar até amanhã.", created_at: new Date(Date.now() - 864e5 * 2).toISOString(), updated_at: agora() }];
     let atual = null; const ouvintes = [];
     const avisa = ev => ouvintes.forEach(f => setTimeout(() => f(ev), 0));
     const precisa = (...p) => { if (!atual || !p.includes(atual.papel)) throw new Error("Seu perfil não tem permissão para esta ação."); };
@@ -259,6 +317,7 @@
       async entrarComo(papel) { atual = perfis.find(p => p.papel === papel); avisa("SIGNED_IN"); },
       async entrar() { throw new Error("Na demonstração, use os botões “Entrar como…”."); },
       async cadastrar() { throw new Error("O cadastro funciona no site publicado com o Supabase. Na demonstração, use “Entrar como…”."); },
+      async podeCadastrarEquipe() { return "nao"; },
       async recuperar() { throw new Error("Disponível no site publicado com o Supabase."); },
       async novaSenha() {},
       async sair() { atual = null; avisa("SIGNED_OUT"); },
@@ -281,7 +340,20 @@
       async statusContato(i, s) { precisa("secretario", "diretor"); contatos.find(c => c.id === i).status = s; },
       async vagasTurmas() { return espera(turmas.map(t => ({ ...t, ocupadas: criancas.filter(c => c.turma_id === t.id && c.ativo).length }))); },
 
-      async minhasCriancas() { return espera(clone(criancas.filter(c => c.responsavel_id === atual?.id && c.ativo).map(comTurma))); },
+      async siteImagens() { return espera(clone(siteImgs)); },
+      async enviarImagemSite(blob, d) { precisa("diretor"); const url = await paraURL(blob); if (d.local !== "galeria") for (let i = siteImgs.length - 1; i >= 0; i--) if (siteImgs[i].local === d.local) siteImgs.splice(i, 1); siteImgs.push({ id: nid(), local: d.local, titulo: d.titulo || null, legenda: d.legenda || null, url, caminho: nid(), ordem: d.ordem || 0, created_at: agora() }); },
+      async atualizarImagemSite(i, patch) { precisa("diretor"); Object.assign(siteImgs.find(x => x.id === i), patch); },
+      async removerImagemSite(i) { precisa("diretor"); siteImgs.splice(siteImgs.findIndex(x => x.id === i), 1); },
+      async fotos(f) {
+        let l = fotos.slice();
+        if (atual && atual.papel === "responsavel") { const minhas = criancas.filter(c => c.responsavel_id === atual.id && c.ativo); l = l.filter(x => x.crianca_id ? minhas.some(c => c.id === x.crianca_id) : minhas.some(c => c.turma_id === x.turma_id)); }
+        if (f && f.turma_id) l = l.filter(x => x.turma_id === f.turma_id);
+        return espera(clone(l.sort((a, b) => b.data.localeCompare(a.data) || b.created_at.localeCompare(a.created_at)).map(x => ({ ...x, turmas: { nome: turmaNome(x.turma_id) }, criancas: x.crianca_id ? { nome: (criancas.find(c => c.id === x.crianca_id) || {}).nome } : null }))));
+      },
+      async enviarFoto(blob, d) { precisa("professor", "secretario", "diretor"); fotos.push({ id: nid(), turma_id: d.turma_id, crianca_id: d.crianca_id || null, legenda: d.legenda || null, data: d.data, caminho: nid(), url: await paraURL(blob), autor_nome: atual.nome, created_at: agora() }); },
+      async removerFoto(i) { precisa("professor", "secretario", "diretor"); fotos.splice(fotos.findIndex(x => x.id === i), 1); },
+
+      async minhasCriancas() { return espera(clone(criancas.filter(c => (c.responsavel_id === atual?.id || c.responsavel2_id === atual?.id) && c.ativo).map(comTurma))); },
       async meusPedidos() { return espera(clone(matriculas.filter(m => m.responsavel_id === atual?.id).sort((a, b) => b.created_at.localeCompare(a.created_at)).map(comTurma))); },
       async pedirMatricula(d) { if (!atual) throw new Error("Entre novamente."); matriculas.unshift({ ...d, id: nid(), responsavel_id: atual.id, status: "enviada", resposta: null, created_at: agora(), updated_at: agora() }); return espera(); },
       async cancelarPedido(i) { const m = matriculas.find(x => x.id === i); if (!["enviada", "em análise", "lista de espera"].includes(m.status)) throw new Error("Este pedido não pode mais ser alterado. Fale com a secretaria."); m.status = "cancelada"; m.updated_at = agora(); },
@@ -291,27 +363,35 @@
 
       async turmas() { return clone(turmas); },
       async salvarTurma(t) { precisa("secretario", "diretor"); Object.assign(turmas.find(x => x.id === t.id), { vagas: t.vagas, faixa: t.faixa }); },
-      async criancas(tid) { return espera(clone(criancas.filter(c => c.ativo && (!tid || c.turma_id === tid)).sort((a, b) => a.nome.localeCompare(b.nome)).map(c => ({ ...comTurma(c), resp: c.responsavel_id ? (p => p && { nome: p.nome, email: p.email })(perfis.find(p => p.id === c.responsavel_id)) : null })))); },
-      async salvarCrianca(c) { precisa("secretario", "diretor"); if (c.id) Object.assign(criancas.find(x => x.id === c.id), c); else criancas.push({ ...c, id: nid(), ativo: true, responsavel_id: null }); },
+      async criancas(tid) { return espera(clone(criancas.filter(c => c.ativo && (!tid || c.turma_id === tid)).sort((a, b) => a.nome.localeCompare(b.nome)).map(c => ({ ...comTurma(c), resp: c.responsavel_id ? (p => p && { nome: p.nome, email: p.email })(perfis.find(p => p.id === c.responsavel_id)) : null, resp2: c.responsavel2_id ? (p => p && { nome: p.nome, email: p.email })(perfis.find(p => p.id === c.responsavel2_id)) : null })))); },
+      async salvarCrianca(c) { precisa("secretario", "diretor"); const liga = e => (perfis.find(p => p.email === (e || "").toLowerCase().trim()) || {}).id || null; const d = { ...c, responsavel_id: liga(c.responsavel_email), responsavel2_id: liga(c.responsavel2_email) }; if (c.id) Object.assign(criancas.find(x => x.id === c.id), d); else criancas.push({ ...d, id: nid(), ativo: true }); },
       async desligarCrianca(i) { precisa("secretario", "diretor"); criancas.find(c => c.id === i).ativo = false; },
-      async vincularResponsavel(cid, email) { precisa("secretario", "diretor"); const p = perfis.find(x => x.email === email.toLowerCase().trim()); if (!p) throw new Error("Nenhuma conta com este e-mail. Peça para o responsável criar a conta na Área do Responsável e tente de novo."); if (!["responsavel", "pendente"].includes(p.papel)) throw new Error("Este e-mail pertence a uma conta da equipe."); criancas.find(c => c.id === cid).responsavel_id = p.id; p.papel = "responsavel"; return p.nome; },
+      async vincularResponsavel(cid, email, slot) { precisa("secretario", "diretor"); const e = (email || "").toLowerCase().trim() || null, c = criancas.find(x => x.id === cid), p = e && perfis.find(x => x.email === e); if (slot === 2) { c.responsavel2_email = e; c.responsavel2_id = p ? p.id : null; } else { c.responsavel_email = e; c.responsavel_id = p ? p.id : null; } return p ? "vinculado" : e ? "aguardando" : "removido"; },
+      async cardapio(desde, ate) { return espera(clone(cardapioL.filter(x => x.data >= desde && x.data <= ate))); },
+      async salvarCardapio(linhas, apagar) { precisa("funcionario", "secretario", "diretor"); linhas.forEach(l => { const x = cardapioL.find(y => y.data === l.data && y.refeicao === l.refeicao); x ? (x.descricao = l.descricao) : cardapioL.push({ ...l, id: nid() }); }); (apagar || []).forEach(a => { const i = cardapioL.findIndex(y => y.data === a.data && y.refeicao === a.refeicao); if (i >= 0) cardapioL.splice(i, 1); }); return espera(); },
+      async minhasSolicitacoes() { return espera(clone(solic.filter(x => x.responsavel_id === atual?.id).map(x => ({ ...x, criancas: x.crianca_id ? { nome: (criancas.find(c => c.id === x.crianca_id) || {}).nome } : null })))); },
+      async pedirAlteracao(d) { if (!atual) throw new Error("Entre novamente."); solic.unshift({ id: nid(), responsavel_id: atual.id, responsavel_nome: atual.nome, crianca_id: d.crianca_id || null, tipo: d.tipo, detalhes: d.detalhes, status: "aberta", created_at: agora(), updated_at: agora() }); return espera(); },
+      async solicitacoes() { precisa("secretario", "diretor"); return espera(clone(solic.map(x => ({ ...x, criancas: x.crianca_id ? { nome: (criancas.find(c => c.id === x.crianca_id) || {}).nome } : null })))); },
+      async responderSolicitacao(i, patch) { precisa("secretario", "diretor"); Object.assign(solic.find(x => x.id === i), patch, { updated_at: agora() }); },
       async matriculas() { precisa("secretario", "diretor"); return espera(clone(matriculas.slice().sort((a, b) => b.created_at.localeCompare(a.created_at)).map(comTurma))); },
       async atualizarMatricula(i, patch) { precisa("secretario", "diretor"); Object.assign(matriculas.find(m => m.id === i), patch, { updated_at: agora() }); },
-      async aprovarMatricula(i, turma, resp) { precisa("secretario", "diretor"); const m = matriculas.find(x => x.id === i); if (m.status === "aprovada") throw new Error("Este pedido já foi aprovado."); if (m.status === "cancelada") throw new Error("Este pedido foi cancelado pelo responsável."); const c = { id: nid(), nome: m.crianca_nome, data_nascimento: m.crianca_nascimento, turma_id: turma || m.turma_id, turno: m.turno, responsavel_id: m.responsavel_id, responsavel_nome: m.responsavel_nome, responsavel_telefone: m.telefone, observacoes: m.observacoes, ativo: true }; criancas.push(c); Object.assign(m, { status: "aprovada", crianca_id: c.id, turma_id: c.turma_id, resposta: resp || "Matrícula aprovada! Bem-vindos ao CEI Perseverança.", updated_at: agora() }); return c.id; },
+      async aprovarMatricula(i, turma, resp) { precisa("secretario", "diretor"); const m = matriculas.find(x => x.id === i); if (m.status === "aprovada") throw new Error("Este pedido já foi aprovado."); if (m.status === "cancelada") throw new Error("Este pedido foi cancelado pelo responsável."); const e2 = (m.responsavel2_email || "").toLowerCase().trim() || null, p2 = e2 && perfis.find(p => p.email === e2); const c = { id: nid(), nome: m.crianca_nome, data_nascimento: m.crianca_nascimento, turma_id: turma || m.turma_id, turno: m.turno, responsavel_id: m.responsavel_id, responsavel_email: (perfis.find(p => p.id === m.responsavel_id) || {}).email || null, responsavel_nome: m.responsavel_nome, responsavel_telefone: m.telefone, responsavel2_email: e2, responsavel2_nome: m.responsavel2_nome || null, responsavel2_id: p2 ? p2.id : null, observacoes: m.observacoes, ativo: true }; criancas.push(c); Object.assign(m, { status: "aprovada", crianca_id: c.id, turma_id: c.turma_id, resposta: resp || "Matrícula aprovada! Bem-vindos ao CEI Perseverança.", updated_at: agora() }); return c.id; },
       async freqTurma(ids, data) { return espera(clone(frequencias.filter(f => ids.includes(f.crianca_id) && f.data === data))); },
       async salvarFreq(rows) { precisa("professor", "secretario", "diretor"); rows.forEach(r => { const f = frequencias.find(x => x.crianca_id === r.crianca_id && x.data === r.data); f ? (f.presente = r.presente) : frequencias.push({ ...r, id: nid() }); }); return espera(); },
       async diariosTurma(ids, data) { return espera(clone(diarios.filter(d => ids.includes(d.crianca_id) && d.data === data))); },
       async salvarDiario(d) { precisa("professor", "secretario", "diretor"); const x = diarios.find(y => y.crianca_id === d.crianca_id && y.data === d.data); const v = { ...d, autor_nome: atual.nome, lido_em: null, updated_at: agora() }; x ? Object.assign(x, v) : diarios.push({ ...v, id: nid() }); return espera(); },
 
-      async baterPonto(tipo, obs) { precisa("funcionario", "professor", "secretario", "diretor"); pontos.push({ id: nid(), user_id: atual.id, nome_registro: atual.nome, tipo, observacao: obs || null, registrado_em: agora() }); return espera(); },
+      async baterPonto(tipo, obs, geo) { precisa("funcionario", "professor", "secretario", "diretor"); if (cfgPonto.exigir && !geo) throw new Error("A Direção exige a localização para bater o ponto. Permita o acesso à localização e tente de novo."); const dist = geo && cfgPonto.lat != null ? Math.round(distanciaM(geo.lat, geo.lng, cfgPonto.lat, cfgPonto.lng)) : null; pontos.push({ id: nid(), user_id: atual.id, nome_registro: atual.nome, tipo, observacao: obs || null, registrado_em: agora(), latitude: geo ? geo.lat : null, longitude: geo ? geo.lng : null, precisao_m: geo ? Math.round(geo.acc) : null, distancia_m: dist }); return espera({ distancia_m: dist }); },
+      async configPonto() { return clone(cfgPonto); },
+      async salvarConfigPonto(v) { precisa("diretor"); Object.assign(cfgPonto, v); },
       async pontos(desde, ate, todos) { if (todos) precisa("diretor"); return espera(clone(pontos.filter(p => (todos || p.user_id === atual.id) && p.registrado_em >= desde && p.registrado_em < ate).sort((a, b) => a.registrado_em.localeCompare(b.registrado_em)))); },
       async ajustarPonto(i, iso, obs) { precisa("diretor"); Object.assign(pontos.find(x => x.id === i), { registrado_em: iso, observacao: obs, ajustado_por: atual.id }); },
       async removerPonto(i) { precisa("diretor"); pontos.splice(pontos.findIndex(x => x.id === i), 1); },
 
       async perfis() { return espera(clone(perfis)); },
-      async atualizarPerfil(i, patch) { precisa("secretario", "diretor"); if (atual.papel !== "diretor" && ("ativo" in patch || (patch.papel && !["pendente", "responsavel"].includes(patch.papel)))) throw new Error("Seu perfil não tem permissão para esta ação."); Object.assign(perfis.find(p => p.id === i), patch); },
+      async atualizarPerfil(i, patch) { precisa("secretario", "diretor"); const alvo = perfis.find(p => p.id === i); if (alvo && alvo.papel === "responsavel" && EQUIPE.includes(patch.papel)) throw new Error("Uma conta de responsável não pode virar conta da equipe. A pessoa deve criar outra conta, com um e-mail liberado pela Direção."); if (atual.papel !== "diretor" && ("ativo" in patch || (patch.papel && !["pendente", "responsavel"].includes(patch.papel)))) throw new Error("Seu perfil não tem permissão para esta ação."); Object.assign(perfis.find(p => p.id === i), patch); },
       async convites() { precisa("secretario", "diretor"); return espera(clone(convites)); },
-      async criarConvite(email, papel) { precisa("secretario", "diretor"); if (atual.papel === "secretario" && !["responsavel", "professor", "funcionario"].includes(papel)) throw new Error("Seu perfil não tem permissão para esta ação."); if (convites.some(c => c.email === email)) throw new Error("Já existe um registro igual a este."); convites.unshift({ email: email.toLowerCase().trim(), papel, created_at: agora() }); },
+      async criarConvite(email, papel) { precisa("diretor"); if (perfis.some(p => p.email === email.toLowerCase().trim())) throw new Error(perfis.find(p => p.email === email.toLowerCase().trim()).papel === "responsavel" ? "Este e-mail já é uma conta de responsável e não pode virar conta da equipe. Use outro e-mail para a equipe." : "Já existe uma conta com este e-mail. Ajuste o perfil dela em Equipe e permissões."); if (atual.papel === "secretario" && !["responsavel", "professor", "funcionario"].includes(papel)) throw new Error("Seu perfil não tem permissão para esta ação."); if (convites.some(c => c.email === email)) throw new Error("Já existe um registro igual a este."); convites.unshift({ email: email.toLowerCase().trim(), papel, created_at: agora() }); },
       async removerConvite(email) { precisa("secretario", "diretor"); convites.splice(convites.findIndex(c => c.email === email), 1); },
       async excluirUsuario(i) { precisa("diretor"); if (i === atual.id) throw new Error("Para excluir a sua própria conta, use Configurações da conta."); perfis.splice(perfis.findIndex(p => p.id === i), 1); criancas.forEach(c => { if (c.responsavel_id === i) c.responsavel_id = null; }); },
 
@@ -370,7 +450,7 @@
     slot.innerHTML = `<button class="acct-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="${perfil ? "Conta de " + esc(perfil.nome) : "Entrar"}">${avatar(perfil, 40)}${perfil ? '<span class="acct-dot" aria-hidden="true"></span>' : ""}</button>
       <div class="acct-menu" role="menu" hidden>
       ${perfil ? `<div class="acct-head">${avatar(perfil, 52)}<div style="min-width:0"><b>${esc(perfil.nome)}</b><small>${esc(email)}</small><span class="pill sun" style="margin-top:6px">${PAPEIS[perfil.papel] || ""}</span></div></div>
-        ${op.semArea ? "" : `<a role="menuitem" href="${area[0]}">${area[1]}</a>`}<a role="menuitem" href="conta.html">Configurações da conta</a><button role="menuitem" type="button" data-sair>Sair</button>`
+        ${op.semArea ? "" : `<a role="menuitem" href="${area[0]}">${area[1]}</a>`}${EQUIPE.includes(perfil.papel) ? (location.pathname.endsWith("responsavel.html") ? `<a role="menuitem" href="equipe.html">Área da Equipe</a>` : `<a role="menuitem" href="responsavel.html">Área do Responsável (família)</a>`) : ""}<a role="menuitem" href="conta.html">Configurações da conta</a><button role="menuitem" type="button" data-sair>Sair</button>`
       : `<div class="acct-head"><div><b>Você não está conectado</b><small>Escolha onde entrar</small></div></div><a role="menuitem" href="responsavel.html">Área do Responsável</a><a role="menuitem" href="equipe.html">Área da Equipe</a>`}
       </div>`;
     const btn = slot.querySelector(".acct-btn"), menu = slot.querySelector(".acct-menu");
@@ -382,6 +462,47 @@
     return perfil;
   }
 
-  window.PV = { config: C, conectar, som, esc, toast, fmtData, fmtDia, fmtHora, hojeISO, isoLocal, diaLocal, idade, PAPEIS, PONTO, STATUS, stClasse, horasDoDia, fmtHoras, traduzErro, avatar, AVATARES, montarMenuConta, areaDe, EQUIPE, montarControles, explosao };
-  document.addEventListener("DOMContentLoaded", montarControles);
+  /* ================= localização (ponto) ================= */
+  function distanciaM(a, b, c, d) { const R = 6371000, r = x => x * Math.PI / 180, dl = r(c - a), dn = r(d - b); return 2 * R * Math.asin(Math.sqrt(Math.sin(dl / 2) ** 2 + Math.cos(r(a)) * Math.cos(r(c)) * Math.sin(dn / 2) ** 2)); }
+  function obterLocal() {
+    return new Promise((res, rej) => {
+      if (!navigator.geolocation) return rej(new Error("Este aparelho não informa a localização."));
+      navigator.geolocation.getCurrentPosition(p => res({ lat: p.coords.latitude, lng: p.coords.longitude, acc: p.coords.accuracy || 0 }),
+        e => rej(new Error(e.code === 1 ? "A permissão de localização foi negada. Libere a localização para este site nas configurações do navegador." : e.code === 3 ? "A localização demorou demais para responder. Tente de novo em um lugar aberto." : "Não foi possível obter a localização agora.")),
+        { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 });
+    });
+  }
+  const fmtDist = m => m == null ? "" : m < 1000 ? m + " m" : (m / 1000).toLocaleString("pt-BR", { maximumFractionDigits: 1 }) + " km";
+
+  /* ================= imagens: reduz antes de enviar ================= */
+  function reduzirImagem(arq, maxLado, qualidade) {
+    return new Promise((res, rej) => {
+      if (!/^image\/(jpeg|png|webp)$/.test(arq.type)) return rej(new Error("Use imagens JPG, PNG ou WebP."));
+      if (arq.size > 25 * 1024 * 1024) return rej(new Error("Imagem muito grande. Escolha uma com menos de 25 MB."));
+      const img = new Image();
+      img.onload = () => { const k = Math.min(1, maxLado / Math.max(img.width, img.height)), c = document.createElement("canvas"); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k); const x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(img.src); c.toBlob(b => b ? res(b) : rej(new Error("Não foi possível processar a imagem.")), "image/jpeg", qualidade || .85); };
+      img.onerror = () => rej(new Error("Arquivo de imagem inválido."));
+      img.src = URL.createObjectURL(arq);
+    });
+  }
+
+  /* ================= aviso de cookies ================= */
+  function avisoCookies(forcar) {
+    if (!forcar && consentimento()) return;
+    let el = document.getElementById("pv-cookies"); if (el) el.remove();
+    el = document.createElement("div"); el.id = "pv-cookies"; el.className = "cookies"; el.setAttribute("role", "dialog"); el.setAttribute("aria-label", "Aviso de cookies");
+    el.innerHTML = `<div><b>Cookies e armazenamento no seu navegador</b><p>Usamos só o essencial para o login funcionar. Com a sua permissão, também lembramos suas preferências (modo claro/escuro e sons). Não usamos cookies de propaganda nem de rastreamento. <a href="privacidade.html#cookies">Saiba mais</a></p></div>
+      <div class="cookies-acoes"><button type="button" class="btn btn-soft btn-sm" data-c="essenciais">Só os essenciais</button><button type="button" class="btn btn-leaf btn-sm" data-c="todos">Aceitar todos</button></div>`;
+    document.body.appendChild(el);
+    el.querySelectorAll("[data-c]").forEach(b => b.onclick = () => {
+      try { localStorage.setItem("pv-cookies", b.dataset.c); } catch (e) {}
+      if (b.dataset.c === "essenciais") PREF.forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
+      else { gravarLS("pv-tema", root.getAttribute("data-theme")); gravarLS("pv-som", som.ligado ? "1" : "0"); }
+      el.classList.add("sai"); setTimeout(() => el.remove(), 300);
+    });
+  }
+  document.addEventListener("click", e => { const a = e.target.closest("[data-cookies]"); if (a) { e.preventDefault(); avisoCookies(true); } });
+
+  window.PV = { config: C, conectar, som, esc, toast, fmtData, fmtDia, fmtHora, hojeISO, isoLocal, diaLocal, idade, PAPEIS, PONTO, STATUS, stClasse, horasDoDia, fmtHoras, traduzErro, avatar, AVATARES, montarMenuConta, areaDe, EQUIPE, montarControles, explosao, reduzirImagem, avisoCookies, obterLocal, distanciaM, fmtDist };
+  document.addEventListener("DOMContentLoaded", () => { montarControles(); avisoCookies(false); });
 })();

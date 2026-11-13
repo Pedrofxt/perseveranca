@@ -5,9 +5,10 @@ Site do Centro de Educação Infantil Perseverança (Paranaguá-PR), com área d
 | Página | Para quem | O que tem |
 |---|---|---|
 | `index.html` | Público | Apresentação, forma de educar, trilha das turmas com vagas, avisos e agenda, contato, onde estamos |
-| `responsavel.html` | Pais e responsáveis | Pedido de matrícula com acompanhamento, diário do dia da criança, avisos da turma, frequência, agenda |
+| `responsavel.html` | Pais e responsáveis | Matrícula com acompanhamento, diário, fotos (individuais e da turma), cardápio, avisos, frequência, agenda e pedidos de alteração de dados |
 | `equipe.html` | Equipe (acesso restrito) | Ponto, diário da turma, chamada, matrículas, crianças, turmas e vagas, avisos, agenda, mensagens, convites, permissões e relatório de ponto |
 | `conta.html` | Qualquer pessoa conectada | Foto ou avatar, nome, telefone, e-mail, senha e exclusão da conta |
+| `privacidade.html` | Todos | Política de Uso e Privacidade (LGPD) e cookies |
 
 Efeitos sonoros são gerados pelo próprio navegador (sem arquivos de áudio) e podem ser desligados no botão de alto-falante. O modo claro/escuro fica no botão de sol/lua.
 
@@ -31,6 +32,14 @@ As regras ficam no banco (RLS). Mesmo que alguém altere o código no navegador,
 
 Crianças que já estudam no CEI: a secretaria cadastra em **Crianças** e usa **Vincular conta** com o e-mail que a família usou.
 
+## Regras de acesso
+
+- **Família:** cada criança pode ter até 2 responsáveis com acesso, pelos e-mails da matrícula. Quem cria a conta com um desses e-mails já entra ligado à criança.
+- **Equipe:** só e-mails liberados pela Direção (em *Liberar e-mails da equipe*) conseguem criar conta na Área da Equipe.
+- Uma conta da equipe também pode ser responsável de uma criança. Uma conta de responsável nunca vira conta da equipe.
+- **Ponto:** a Direção pode pedir ou exigir a localização ao bater o ponto e definir o local do CEI em *Relatório de ponto*.
+- **Imagens da página inicial:** trocadas pela Direção em *Imagens do site*.
+
 ## Primeiro acesso
 
 1. Abra `equipe.html` → **Criar conta**. A primeira conta criada ali vira Direção.
@@ -50,4 +59,6 @@ Se `assets/config.js` estiver vazio ou o Supabase estiver fora do ar, o site abr
 
 ## Banco de dados
 
-`supabase/schema.sql` tem o esquema completo (tabelas, regras de acesso, funções e dados iniciais das turmas).
+Rode no SQL Editor do Supabase, nesta ordem: `supabase/schema.sql` e depois `supabase/02_atualizacao.sql`. O segundo pode ser rodado mais de uma vez sem problema.
+
+Para não enviar e-mail de confirmação no cadastro: *Authentication → Sign In / Providers → Email* → desligue **Confirm email**. (O banco já confirma as contas sozinho, então o login funciona de qualquer jeito.)

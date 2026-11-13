@@ -44,6 +44,17 @@
 .pedido .resp b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 .ring{--p:0;width:116px;height:116px;border-radius:50%;background:conic-gradient(#fff calc(var(--p)*1%),rgba(255,255,255,.25) 0);display:grid;place-items:center}
 .ring span{width:90px;height:90px;border-radius:50%;background:var(--coral);display:grid;place-items:center;font-family:var(--f-display);font-weight:700;font-size:26px;line-height:1;text-align:center}
+.cardapio{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.dia-c{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:14px;display:grid;gap:10px;align-content:start;animation:viewIn .4s both}
+.dia-c.hoje{border:2px solid var(--coral)}
+.dia-c h3{font-size:19px;display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.dia-c h3 small{font-family:var(--f-body);font-size:12px;color:var(--muted)}
+.ref{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:start}
+.ref .ri{font-size:20px;line-height:1.2}
+.ref b{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.ref p{font-size:14.5px}
+@media (max-width:1000px){.cardapio{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.cardapio{grid-template-columns:1fr}}
 .ring small{display:block;font-family:var(--f-body);font-size:11px;font-weight:800}
 </style>
 </head>
@@ -81,12 +92,15 @@
       <div id="wCriar" hidden style="display:grid;gap:14px">
         <label class="field" for="lNome">Seu nome completo<input id="lNome" autocomplete="name" maxlength="120"></label>
         <label class="field" for="lTel">Telefone / WhatsApp<input id="lTel" type="tel" autocomplete="tel" maxlength="40" placeholder="(41) 9 0000-0000"></label>
+        <label class="aceite" for="lAceite"><input type="checkbox" id="lAceite"><span>Li e aceito a <a href="privacidade.html" target="_blank" rel="noopener">Política de Uso e Privacidade</a>.</span></label>
+        <p class="hint">Se a criança já estuda no CEI, use o mesmo e-mail informado na matrícula: a conta já entra ligada a ela.</p>
       </div>
       <label class="field" for="lEmail">E-mail<input id="lEmail" type="email" autocomplete="email" required></label>
       <label class="field" for="lSenha">Senha<input id="lSenha" type="password" autocomplete="current-password" minlength="6" required></label>
       <div id="lMsg" role="status" aria-live="polite"></div>
       <button class="btn btn-leaf" type="submit" id="lBtn">Entrar</button>
       <button class="btn btn-soft btn-sm" type="button" id="esqueci" style="justify-self:start">Esqueci minha senha</button>
+      <p class="hint"><a href="privacidade.html">Política de Uso e Privacidade</a></p>
     </form>
   </div>
 </section>
@@ -103,8 +117,11 @@
       <button data-v="inicio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-7 9 7v11H3z"/></svg>Início</button>
       <button data-v="diario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4z"/><path d="M8 9h8M8 13h6"/></svg>Diário<span class="badge" id="bDiario" hidden></span></button>
       <button data-v="matricula"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M9 15l2 2 4-4"/></svg>Matrícula</button>
+      <button data-v="fotos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Fotos</button>
+      <button data-v="cardapio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 21V3c-2 0-4 3-4 7h4"/></svg>Cardápio</button>
       <button data-v="frequencia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 15l2 2 4-4"/></svg>Frequência</button>
       <button data-v="avisos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l15-6v14L3 13z"/><path d="M7 13v5"/></svg>Avisos</button>
+      <button data-v="dados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Alterar dados</button>
       <button data-v="agenda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Agenda</button>
     </nav>
     <div class="who"><div style="display:flex;gap:10px;align-items:center"><span id="whoAv"></span><b id="whoNome" style="min-width:0;overflow-wrap:anywhere"></b></div><div style="display:flex;gap:8px;align-items:center"><button class="btn btn-ghost btn-sm" id="sair" style="color:#fff">Sair</button></div></div>
@@ -114,6 +131,7 @@
 </div>
 
 <dialog id="dlg"><form method="dialog" id="dlgForm"></form></dialog>
+<dialog id="lb" class="lb" aria-label="Foto ampliada"><img id="lbImg" alt=""><div class="barra"><p id="lbTxt"></p><span style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-ghost btn-sm" type="button" id="lbAnt" aria-label="Foto anterior">←</button><button class="btn btn-ghost btn-sm" type="button" id="lbProx" aria-label="Próxima foto">→</button><a class="btn btn-ghost btn-sm" id="lbAbrir" target="_blank" rel="noopener">Abrir original</a><button class="btn btn-sun btn-sm" type="button" id="lbFechar">Fechar</button></span></div></dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="assets/config.js"></script>
@@ -133,7 +151,7 @@
   const EMO={alimentacao:{'Comeu tudo':'😋','Comeu bem':'🙂','Comeu pouco':'😐','Não quis comer':'🙅'},sono:{'Dormiu bem':'😴','Dormiu pouco':'🥱','Não dormiu':'👀'},humor:{'Muito feliz':'😄','Tranquilo(a)':'😊','Sonolento(a)':'😪','Choroso(a)':'😢','Agitado(a)':'🤸'}};
 
   function telas(n){ ['telaCarregando','telaLogin','telaSenha','telaApp'].forEach(t=>$('#'+t).hidden=t!==n); }
-  function topo(t,sub,extra){ return `<div class="topline"><div style="display:flex;gap:10px;align-items:center"><button class="btn btn-soft btn-sm mobile-nav" onclick="document.getElementById('side').classList.add('open')" aria-label="Abrir menu">☰ Menu</button><div><h1>${t}</h1>${sub?`<p class="muted">${sub}</p>`:''}</div></div>${extra||''}</div>`; }
+  function topo(t,sub,extra){ return (perfil&&PV.EQUIPE.includes(perfil.papel)?`<div class="msg ok" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between"><span>Você está na Área do Responsável como família. Sua conta também é da equipe.</span><a class="btn btn-leaf btn-sm" href="equipe.html">Ir para a Área da Equipe</a></div>`:'')+`<div class="topline"><div style="display:flex;gap:10px;align-items:center"><button class="btn btn-soft btn-sm mobile-nav" onclick="document.getElementById('side').classList.add('open')" aria-label="Abrir menu">☰ Menu</button><div><h1>${t}</h1>${sub?`<p class="muted">${sub}</p>`:''}</div></div>${extra||''}</div>`; }
   function dialogo(html,onOk,rotulo){
     const d=$('#dlg'), f=$('#dlgForm'); f.innerHTML=html+`<div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-soft btn-sm" value="cancel" formnovalidate>Voltar</button><button class="btn btn-leaf btn-sm" value="ok">${rotulo||'Confirmar'}</button></div>`;
     d.onclose=async()=>{ if(d.returnValue==='ok'){ try{ await onOk(f); }catch(err){ toast(err.message,'bad'); } } }; d.returnValue=''; d.showModal();
@@ -153,8 +171,9 @@
     btn.disabled=true;
     try{
       if(modo==='criar'){ const nome=$('#lNome').value.trim(); if(nome.length<3) throw new Error('Informe seu nome completo.');
-        const r=await api.cadastrar({nome,email,senha,telefone:$('#lTel').value.trim(),origem:'responsavel'});
-        if(r.precisaConfirmar){ m.className='msg ok'; m.textContent='Conta criada! Abra o link que enviamos para '+email+' e depois entre aqui.'; som.sucesso(); } }
+        if(!$('#lAceite').checked) throw new Error('Para criar a conta, aceite a Política de Uso e Privacidade.');
+        const r=await api.cadastrar({nome,email,senha,telefone:$('#lTel').value.trim(),origem:'responsavel',aceite:true});
+        if(r.precisaConfirmar){ m.className='msg ok'; m.textContent='Conta criada! Agora entre com seu e-mail e senha.'; som.sucesso(); document.querySelector('[data-modo="entrar"]').click(); } }
       else await api.entrar(email,senha);
     }catch(err){ m.className='msg bad'; m.textContent=err.message; som.erro(); }
     btn.disabled=false;
@@ -180,7 +199,7 @@
   const V={};
   V.inicio=async()=>{
     main.innerHTML=topo('Olá, '+esc(perfil.nome.split(' ')[0])+'!')+'<div class="view"><div class="skel" style="height:150px"></div></div>';
-    await carregarBase(); await contarNaoLidos();
+    await carregarBase(); await contarNaoLidos(); let fotosR=[]; try{ fotosR=(await api.fotos({limite:8})).slice(0,4); }catch(e){}
     const av=(await api.avisos('responsaveis')).slice(0,3);
     const abertos=pedidos.filter(p=>['enviada','em análise','lista de espera'].includes(p.status));
     const hoje=PV.hojeISO();
@@ -189,6 +208,7 @@
         <button class="btn btn-sun" onclick="PV_ir('${filhos.length?'diario':'matricula'}')">${filhos.length?'Abrir o diário':'Solicitar vaga'}</button></div>
       ${filhos.length?`<div class="kids">${filhos.map(f=>`<button class="kid" data-k="${f.id}" data-sfx-hover><span class="top">${face(f)}<span><h3>${esc(f.nome)}</h3><span class="muted">${esc(f.turmas?.nome||'Sem turma')} · ${idade(f.data_nascimento)}</span></span></span>${f._naoLidos?`<span class="pill sun novo">📒 ${f._naoLidos} recado${f._naoLidos>1?'s':''} novo${f._naoLidos>1?'s':''}</span>`:'<span class="pill ok">Diário em dia</span>'}</button>`).join('')}</div>`:semFilhos()}
       ${abertos.length?`<div style="display:grid;gap:10px"><h3 style="font-size:22px">Pedidos de matrícula em andamento</h3>${abertos.map(p=>`<div class="pedido"><div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between"><b>${esc(p.crianca_nome)}</b><span class="${stClasse(p.status)}">${esc(p.status)}</span></div>${linhaEtapas(p.status)}</div>`).join('')}</div>`:''}
+      ${fotosR.length?`<div style="display:grid;gap:10px"><div class="topline"><h3 style="font-size:22px">Fotos recentes</h3><button class="btn btn-soft btn-sm" onclick="PV_ir('fotos')">Ver todas</button></div><div class="fgrid">${fotosR.map(f=>`<figure class="fcard" onclick="PV_ir('fotos')" data-ver="1"><img src="${esc(f.url||'')}" alt="${esc(f.legenda||'Foto')}" loading="lazy"><figcaption><small>${fmtData(f.data)}</small></figcaption></figure>`).join('')}</div></div>`:''}
       <div style="display:grid;gap:10px"><h3 style="font-size:22px">Últimos avisos</h3>${av.length?av.map(a=>`<article class="item"><div class="row"><h3>${esc(a.titulo)}</h3><span style="display:flex;gap:6px">${a.turmas?`<span class="pill sea">${esc(a.turmas.nome)}</span>`:''}<span class="pill">${fmtData(a.created_at)}</span></span></div><p>${esc(a.corpo)}</p></article>`).join(''):'<div class="empty"><b>Sem avisos novos</b></div>'}</div>
     </div>`;
     document.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{ filhoSel=b.dataset.k; ir('diario'); });
@@ -228,6 +248,9 @@
           <label class="field" for="mPar">Parentesco<select id="mPar"><option>Mãe</option><option>Pai</option><option>Avó/Avô</option><option>Tia/Tio</option><option>Responsável legal</option><option>Outro</option></select></label></div>
         <div class="grid2"><label class="field" for="mTel">Telefone / WhatsApp *<input id="mTel" type="tel" required maxlength="40" value="${esc(perfil.telefone||'')}"></label>
           <label class="field" for="mEnd">Bairro / endereço<input id="mEnd" maxlength="200"></label></div>
+        <div class="card" style="background:var(--surface-2);border:0;display:grid;gap:12px;padding:16px"><b style="font-family:var(--f-display);font-weight:400;color:var(--heading)">2º responsável (opcional)</b>
+          <p class="hint" style="margin-top:-6px">Só os e-mails da matrícula podem acompanhar a criança no site: o seu e, se quiser, o de mais uma pessoa.</p>
+          <div class="grid2"><label class="field" for="mR2">Nome<input id="mR2" maxlength="120"></label><label class="field" for="mE2">E-mail<input id="mE2" type="email" maxlength="200" placeholder="email@exemplo.com"></label></div></div>
         <label class="field" for="mObs">Observações<textarea id="mObs" maxlength="1000" placeholder="Ex.: irmão já estuda no CEI, necessidades da criança, melhor horário para contato"></textarea></label>
         <button class="btn btn-coral" type="submit" style="justify-self:start" id="mBtn">Enviar pedido</button>
       </form>
@@ -242,8 +265,10 @@
     $('#mNasc').addEventListener('change',()=>{ const v=$('#mNasc').value; if(!v) return; const meses=(Date.now()-new Date(v+'T12:00').getTime())/2.63e9; const ord=meses<12?1:meses<24?2:meses<36?3:meses<48?4:5; const t=vagas.find(x=>x.ordem===ord); if(t){ $('#mTurma').value=t.id; $('#sugestao').textContent='Sugestão pela idade: '+t.nome+'. A secretaria confirma a turma.'; som.boing(); } });
     $('#fMat').addEventListener('submit',async e=>{
       e.preventDefault();
-      const d={crianca_nome:$('#mNome').value.trim(),crianca_nascimento:$('#mNasc').value,turma_id:$('#mTurma').value||null,turno:$('#mTurno').value,responsavel_nome:$('#mResp').value.trim(),parentesco:$('#mPar').value,telefone:$('#mTel').value.trim(),endereco:$('#mEnd').value.trim()||null,observacoes:$('#mObs').value.trim()||null};
+      const d={crianca_nome:$('#mNome').value.trim(),crianca_nascimento:$('#mNasc').value,turma_id:$('#mTurma').value||null,turno:$('#mTurno').value,responsavel_nome:$('#mResp').value.trim(),parentesco:$('#mPar').value,telefone:$('#mTel').value.trim(),endereco:$('#mEnd').value.trim()||null,observacoes:$('#mObs').value.trim()||null,responsavel2_nome:$('#mR2').value.trim()||null,responsavel2_email:$('#mE2').value.trim().toLowerCase()||null};
       if(d.crianca_nome.length<3||!d.crianca_nascimento||d.responsavel_nome.length<3||d.telefone.length<8){ toast('Preencha os campos obrigatórios: nome e nascimento da criança, seu nome e telefone.','bad'); return; }
+      if(d.responsavel2_email&&!/^\S+@\S+\.\S+$/.test(d.responsavel2_email)){ toast('O e-mail do 2º responsável parece incompleto.','bad'); return; }
+      if(d.responsavel2_email&&d.responsavel2_email===(perfil.email||'').toLowerCase()){ toast('O 2º responsável precisa ter um e-mail diferente do seu.','bad'); return; }
       $('#mBtn').disabled=true;
       try{ await api.pedirMatricula(d); som.sucesso(); toast('Pedido enviado! A secretaria vai analisar e responder por aqui.'); V.matricula(); }
       catch(err){ toast(err.message,'bad'); $('#mBtn').disabled=false; }
@@ -267,6 +292,68 @@
     await render();
   };
 
+
+  V.fotos=async()=>{
+    await carregarBase();
+    if(!filhos.length){ main.innerHTML=topo('Fotos')+`<div class="view">${semFilhos()}</div>`; return; }
+    main.innerHTML=topo('Fotos')+'<div class="view"><div class="skel" style="height:200px"></div></div>';
+    const todas=await api.fotos(); let sel='todas', lista=[], idx=0;
+    function render(){
+      lista=todas.filter(f=>{ if(sel==='todas') return true; const k=filhos.find(x=>x.id===sel); return f.crianca_id===sel||(!f.crianca_id&&k&&f.turma_id===k.turma_id); });
+      const g={}; lista.forEach(f=>(g[f.data]=g[f.data]||[]).push(f));
+      main.innerHTML=topo('Fotos','Enviadas pela equipe do CEI. Só a família vê as fotos da sua criança e da turma dela.')+`<div class="view">
+        ${filhos.length>1?`<div class="tabs" role="tablist"><button role="tab" data-fs="todas" aria-selected="${sel==='todas'}">Todas</button>${filhos.map(f=>`<button role="tab" data-fs="${f.id}" aria-selected="${sel===f.id}">${esc(f.nome.split(' ')[0])}</button>`).join('')}</div>`:''}
+        ${Object.keys(g).length?Object.keys(g).map(d=>`<section style="display:grid;gap:10px"><h3 style="font-size:20px">${fmtDia(d)}</h3><div class="fgrid">${g[d].map(f=>`<figure class="fcard" data-ver="${lista.indexOf(f)}" tabindex="0" role="button" aria-label="Ampliar foto"><img src="${esc(f.url||'')}" alt="${esc(f.legenda||'Foto')}" loading="lazy"><figcaption><b>${f.criancas?esc(f.criancas.nome.split(' ')[0]):'Turma toda'}</b>${f.legenda?`<small>${esc(f.legenda)}</small>`:''}</figcaption></figure>`).join('')}</div></section>`).join(''):'<div class="empty"><b>Nenhuma foto ainda</b>Quando a professora enviar fotos, elas aparecem aqui.</div>'}</div>`;
+      document.querySelectorAll('[data-fs]').forEach(b=>b.onclick=()=>{ sel=b.dataset.fs; render(); });
+      document.querySelectorAll('.fcard[data-ver]').forEach(c=>{ const abrir=()=>mostrar(+c.dataset.ver); c.onclick=abrir; c.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); abrir(); } }; });
+    }
+    function mostrar(i){ idx=(i+lista.length)%lista.length; const f=lista[idx]; $('#lbImg').src=f.url||''; $('#lbImg').alt=f.legenda||'Foto'; $('#lbTxt').textContent=[f.criancas?.nome||f.turmas?.nome, fmtData(f.data), f.legenda].filter(Boolean).join(' · '); $('#lbAbrir').href=f.url||'#'; if(!$('#lb').open) $('#lb').showModal(); som.pop(); }
+    $('#lbAnt').onclick=()=>mostrar(idx-1); $('#lbProx').onclick=()=>mostrar(idx+1); $('#lbFechar').onclick=()=>$('#lb').close();
+    $('#lb').onkeydown=e=>{ if(e.key==='ArrowLeft') mostrar(idx-1); if(e.key==='ArrowRight') mostrar(idx+1); };
+    render();
+  };
+
+  V.cardapio=async()=>{
+    const seg=d=>{ const x=new Date(d); x.setHours(12,0,0,0); x.setDate(x.getDate()-((x.getDay()+6)%7)); return x; };
+    let ini=seg(new Date());
+    const REF=['Café da manhã','Almoço','Lanche da tarde','Jantar'], ICO={'Café da manhã':'☕','Almoço':'🍲','Lanche da tarde':'🍎','Jantar':'🌙'};
+    async function render(){
+      const dias=[...Array(5)].map((_,i)=>{ const x=new Date(ini); x.setDate(ini.getDate()+i); return PV.isoLocal(x); });
+      const itens=await api.cardapio(dias[0],dias[4]); const hoje=PV.hojeISO();
+      const refs=REF.filter(r=>itens.some(i=>i.refeicao===r));
+      main.innerHTML=topo('Cardápio','O que as crianças comem no CEI durante a semana',`<span style="display:flex;gap:6px"><button class="btn btn-soft btn-sm" id="cAnt" aria-label="Semana anterior">←</button><button class="btn btn-soft btn-sm" id="cHoje">Esta semana</button><button class="btn btn-soft btn-sm" id="cProx" aria-label="Próxima semana">→</button></span>`)+`<div class="view">
+        <p class="muted">Semana de ${fmtData(dias[0])} a ${fmtData(dias[4])}</p>
+        ${itens.length?`<div class="cardapio">${dias.map((d,i)=>`<article class="dia-c ${d===hoje?'hoje':''}" style="animation-delay:${i*60}ms"><h3>${fmtDia(d).split(',')[0]}<small>${new Date(d+'T12:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}</small></h3>${refs.map(r=>{ const it=itens.find(x=>x.data===d&&x.refeicao===r); return `<div class="ref"><span class="ri" aria-hidden="true">${ICO[r]}</span><div><b>${r}</b><p>${it?esc(it.descricao):'<span class="muted">—</span>'}</p></div></div>`; }).join('')}</article>`).join('')}</div>`:'<div class="empty"><b>Cardápio desta semana ainda não publicado</b>A equipe do CEI publica o cardápio aqui.</div>'}
+        <p class="hint">Se a criança tem alguma restrição alimentar, avise a secretaria em “Alterar dados”.</p></div>`;
+      $('#cAnt').onclick=()=>{ ini.setDate(ini.getDate()-7); render(); }; $('#cProx').onclick=()=>{ ini.setDate(ini.getDate()+7); render(); }; $('#cHoje').onclick=()=>{ ini=seg(new Date()); render(); };
+    }
+    await render();
+  };
+
+  V.dados=async()=>{
+    await carregarBase();
+    const ss=await api.minhasSolicitacoes();
+    const TIPOS=['Telefone','Endereço','E-mail de responsável','Nome do responsável','Incluir 2º responsável','Trocar 2º responsável','Outro'];
+    const COR={'aberta':'','em andamento':'sea','concluída':'ok','recusada':'bad'};
+    main.innerHTML=topo('Alterar dados','Peça à secretaria para atualizar os dados dos responsáveis')+`<div class="view split2">
+      <form class="card" id="fSol" style="display:grid;gap:14px;align-content:start" novalidate>
+        <h3 style="font-size:22px">Novo pedido</h3>
+        ${filhos.length?`<label class="field" for="sC">Criança<select id="sC">${filhos.length>1?'<option value="">Todas as minhas crianças</option>':''}${filhos.map(f=>`<option value="${f.id}">${esc(f.nome)}</option>`).join('')}</select></label>`:''}
+        <label class="field" for="sT">O que precisa mudar<select id="sT">${TIPOS.map(t=>`<option>${t}</option>`).join('')}</select></label>
+        <label class="field" for="sD">Detalhes<textarea id="sD" maxlength="1500" placeholder="Escreva o dado novo. Ex.: novo telefone (41) 9 0000-0000"></textarea></label>
+        <p class="hint" id="sDica"></p>
+        <button class="btn btn-coral" type="submit" style="justify-self:start">Enviar pedido</button>
+      </form>
+      <div style="display:grid;gap:12px;align-content:start">
+        ${filhos.length?`<div class="card" style="display:grid;gap:10px"><h3 style="font-size:20px">Responsáveis cadastrados</h3>${filhos.map(f=>`<div style="display:grid;gap:2px"><b>${esc(f.nome)}</b><small class="muted">1º: ${esc(f.responsavel_nome||'—')}${f.responsavel_email?' · '+esc(f.responsavel_email):''}</small><small class="muted">2º: ${esc(f.responsavel2_nome||'—')}${f.responsavel2_email?' · '+esc(f.responsavel2_email):''}</small></div>`).join('')}</div>`:''}
+        <h3 style="font-size:20px">Meus pedidos</h3>
+        ${ss.length?ss.map(x=>`<article class="item"><div class="row"><h3 style="font-size:17px">${esc(x.tipo)}</h3><span class="pill ${COR[x.status]}">${esc(x.status)}</span></div><p>${esc(x.detalhes)}</p><small class="muted">${x.criancas?esc(x.criancas.nome)+' · ':''}${fmtData(x.created_at)}</small>${x.resposta?`<div class="msg ok" style="font-weight:600">Secretaria: ${esc(x.resposta)}</div>`:''}</article>`).join(''):'<div class="empty"><b>Nenhum pedido ainda</b></div>'}
+      </div></div>`;
+    const dica={'E-mail de responsável':'Só e-mails cadastrados pela secretaria conseguem ver a criança no site.','Incluir 2º responsável':'Informe nome e e-mail da pessoa. Ela poderá criar a conta com esse e-mail e acompanhar a criança. Cada criança pode ter até 2 responsáveis.','Trocar 2º responsável':'Informe nome e e-mail da nova pessoa. A anterior deixa de ter acesso.'};
+    const sd=()=>{ $('#sDica').textContent=dica[$('#sT').value]||''; }; $('#sT').onchange=sd; sd();
+    $('#fSol').onsubmit=async e=>{ e.preventDefault(); const d={crianca_id:$('#sC')?.value||null,tipo:$('#sT').value,detalhes:$('#sD').value.trim()}; if(d.detalhes.length<3){ toast('Escreva o que precisa mudar.','bad'); return; } try{ await api.pedirAlteracao(d); som.sucesso(); toast('Pedido enviado à secretaria.'); V.dados(); }catch(err){ toast(err.message,'bad'); } };
+  };
+
   V.avisos=async()=>{
     const [r,p]=await Promise.all([api.avisos('responsaveis'),api.avisos('publico')]);
     const todos=[...r.map(x=>({...x,tag:x.turmas?x.turmas.nome:'Famílias'})),...p.map(x=>({...x,tag:'Geral'}))].sort((a,b)=>(b.fixado-a.fixado)||b.created_at.localeCompare(a.created_at));
@@ -284,9 +371,7 @@
     perfil=await api.perfil(); telas('telaApp');
     PV.montarMenuConta($('#acct'),api,perfil||null,{semArea:true});
     $('#whoAv').innerHTML=PV.avatar(perfil,36); $('#whoNome').textContent=perfil?.nome||s.user.email;
-    if(perfil && PV.EQUIPE.includes(perfil.papel)){
-      $('#nav').hidden=true; main.innerHTML=topo('Esta é a Área do Responsável')+`<div class="view"><div class="empty"><b>Você entrou com uma conta da equipe</b>Use a Área da Equipe para matrículas, diário, chamada e ponto.<a class="btn btn-leaf" href="equipe.html" style="margin-top:10px">Ir para a Área da Equipe</a></div></div>`; return;
-    }
+
     if(perfil && !perfil.ativo){ $('#nav').hidden=true; main.innerHTML=topo('Conta bloqueada')+'<div class="empty"><b>Sua conta está bloqueada</b>Fale com a secretaria do CEI.</div>'; return; }
     $('#nav').hidden=false;
     ir(querMatricula?'matricula':'inicio');

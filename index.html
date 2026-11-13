@@ -101,11 +101,11 @@ nav.menu a:hover::after{transform:scaleX(1)}
 .badge50{justify-self:center;width:min(300px,80%);aspect-ratio:1;position:relative;display:grid;place-items:center;animation:crestIn 1s .2s cubic-bezier(.2,1.5,.4,1) both}
 .badge50 .ring{position:absolute;inset:0;border-radius:50%;background:var(--surface);box-shadow:0 30px 50px -20px rgba(63,58,100,.4);border:8px dashed var(--coral)}
 .badge50 .ring::after{content:"";position:absolute;inset:14px;border-radius:50%;border:3px solid var(--leaf)}
-.badge50 .txt{position:relative;text-align:center;color:var(--ink);line-height:1}
+.badge50 .txt{position:relative;text-align:center;color:var(--ink);line-height:1;display:grid;justify-items:center}
 .badge50 .num{font-family:var(--f-display);font-weight:400;font-size:clamp(84px,11vw,124px);color:var(--leaf);display:block;font-variant-numeric:tabular-nums}
 .badge50 .sub{font-family:var(--f-hand);font-size:17px;display:block;margin-top:2px;color:var(--heading)}
-.badge50 .orbit{position:absolute;inset:-18px;animation:spin 18s linear infinite}
-.badge50 .orbit span{position:absolute;width:26px;height:26px;border-radius:50%}
+.badge50 .orbit{position:absolute;inset:-14px;border-radius:50%;animation:spin 18s linear infinite}
+.badge50 .orbit span{position:absolute;width:24px;height:24px;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 4px var(--bg)}
 @keyframes crestIn{from{transform:scale(.5) rotate(-20deg);opacity:0}to{transform:none;opacity:1}}
 @media (max-width:880px){.hero .wrap{grid-template-columns:1fr;padding-block:40px 160px}.badge50{order:-1;width:190px}.badge50 .num{font-size:74px}.badge50 .sub{font-size:18px}}
 
@@ -246,6 +246,16 @@ footer a:hover{opacity:1;text-decoration:underline}
 footer .bottom{grid-column:1/-1;border-top:1px solid rgba(255,255,255,.18);padding-top:18px;font-size:13.5px;opacity:.75;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}
 @media (max-width:900px){footer .wrap{grid-template-columns:1fr 1fr}}
 @media (max-width:560px){footer .wrap{grid-template-columns:1fr}}
+
+/* imagens enviadas pela direção */
+.hero-visual{position:relative;display:grid;place-items:center;width:100%}
+.hero-visual.com-foto .foto-hero{width:min(460px,100%);aspect-ratio:4/5;border-radius:36px 36px 36px 120px;overflow:hidden;box-shadow:0 30px 60px -24px rgba(63,58,100,.5);border:8px solid #fff;transform:rotate(2deg);animation:crestIn 1s .2s cubic-bezier(.2,1.5,.4,1) both}
+.hero-visual.com-foto .foto-hero img{width:100%;height:100%;object-fit:cover}
+.hero-visual.com-foto .badge50{position:absolute;left:-30px;bottom:-24px;width:150px}
+.hero-visual.com-foto .badge50 .num{font-size:56px}.hero-visual.com-foto .badge50 .sub{font-size:12px}.hero-visual.com-foto .badge50 .ring{border-width:5px}
+.drawing.com-foto{aspect-ratio:auto}
+.drawing.com-foto img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:40px 40px 140px 40px;border:8px solid #fff;box-shadow:var(--shadow)}
+@media (max-width:880px){.hero-visual{order:-1}.hero-visual.com-foto .foto-hero{width:min(320px,86%);aspect-ratio:1}.hero-visual.com-foto .badge50{left:0;width:110px;bottom:-14px}.hero-visual.com-foto .badge50 .num{font-size:40px}}
 </style>
 </head>
 <body>
@@ -297,11 +307,11 @@ footer .bottom{grid-column:1/-1;border-top:1px solid rgba(255,255,255,.18);paddi
       </div>
       <p class="hint-pop" aria-hidden="true"><i>👆</i> toque nas bolhas e no mar</p>
     </div>
-    <div class="badge50 layer" data-depth="-10" aria-hidden="true">
+    <div class="hero-visual" id="heroVisual"><div class="badge50 layer" data-depth="-10" aria-hidden="true">
       <div class="ring"></div>
-      <div class="orbit"><span style="top:0;left:50%;background:var(--coral)"></span><span style="bottom:6%;left:8%;background:var(--sea)"></span><span style="bottom:6%;right:8%;background:var(--leaf)"></span></div>
+      <div class="orbit"><span style="top:0;left:50%;background:var(--coral)"></span><span style="top:75%;left:6.7%;background:var(--sun)"></span><span style="top:75%;left:93.3%;background:var(--leaf)"></span></div>
       <div class="txt"><span class="num" id="num50">50</span><span class="sub">anos de dedicação</span></div>
-    </div>
+    </div></div>
   </div>
   <div class="sea" id="mar" title="Toque no mar">
     <svg viewBox="0 0 2880 140" preserveAspectRatio="none" aria-hidden="true">
@@ -338,7 +348,7 @@ footer .bottom{grid-column:1/-1;border-top:1px solid rgba(255,255,255,.18);paddi
         <div class="fact" data-sfx-hover><b>Família</b><small>parceira em cada etapa</small></div>
       </div>
     </div>
-    <div class="drawing reveal" aria-hidden="true">
+    <div class="drawing reveal" id="sobreImg" aria-hidden="true">
       <svg viewBox="0 0 400 400">
         <circle cx="200" cy="200" r="190" fill="var(--surface-2)"/>
         <path d="M30 270 Q 200 220 370 270 L 370 330 Q 200 400 30 330 Z" fill="var(--leaf)" opacity=".85"/>
@@ -426,7 +436,7 @@ footer .bottom{grid-column:1/-1;border-top:1px solid rgba(255,255,255,.18);paddi
 <section class="block alt" id="galeria">
   <div class="wrap">
     <div class="head reveal"><span class="label">Galeria</span><h2>O dia a dia no Perseverança</h2></div>
-    <div class="gallery reveal">
+    <div class="gallery reveal" id="galeriaGrid">
       <div class="ph" data-sfx-hover><span>Nosso espaço<small>Foto em breve</small></span></div>
       <div class="ph" data-sfx-hover><span>Berçário<small>Foto em breve</small></span></div>
       <div class="ph" data-sfx-hover><span>Hora do lanche<small>Foto em breve</small></span></div>
@@ -477,7 +487,7 @@ footer .bottom{grid-column:1/-1;border-top:1px solid rgba(255,255,255,.18);paddi
       <p style="margin-top:14px;opacity:.85;max-width:38ch">Centro de Educação Infantil Perseverança. Instituição sem fins lucrativos.</p>
     </div>
     <div><h4>Navegação</h4><ul><li><a href="#sobre">Sobre</a></li><li><a href="#turmas">Turmas</a></li><li><a href="#avisos">Avisos</a></li><li><a href="#onde-estamos">Onde estamos</a></li></ul></div>
-    <div><h4>Acessos</h4><ul><li><a href="responsavel.html">Área do Responsável</a></li><li><a href="equipe.html">Área da Equipe</a></li><li><a href="conta.html">Minha conta</a></li></ul></div>
+    <div><h4>Acessos</h4><ul><li><a href="responsavel.html">Área do Responsável</a></li><li><a href="equipe.html">Área da Equipe</a></li><li><a href="conta.html">Minha conta</a></li><li><a href="privacidade.html">Política de Uso e Privacidade</a></li><li><a href="privacidade.html#cookies" data-cookies>Preferências de cookies</a></li></ul></div>
     <div><h4>Plataformas</h4><ul><li><a href="https://prof.saguiedu.com.br" target="_blank" rel="noopener">SaguiEdu · Educadores</a></li><li><a href="https://pais.saguiedu.com.br" target="_blank" rel="noopener">SaguiEdu · Responsáveis</a></li><li><a href="https://app2.saguiedu.com.br" target="_blank" rel="noopener">SaguiEdu · Gestão</a></li></ul></div>
     <div class="bottom"><span>© <span id="ano">2026</span> Centro de Educação Infantil Perseverança</span><span>R. José Antônio Temporão, 169 · (41) 3425-5968</span></div>
   </div>
@@ -561,6 +571,15 @@ footer .bottom{grid-column:1/-1;border-top:1px solid rgba(255,255,255,.18);paddi
   async function conta(){ const p=await PV.montarMenuConta($('#acct'),api,undefined,{aoSair:conta}); document.querySelectorAll('[data-deslogado]').forEach(a=>a.hidden=!!p); }
   conta();
   try{ if(sessionStorage.getItem('pv-conta-excluida')){ sessionStorage.removeItem('pv-conta-excluida'); toast('Sua conta foi excluída.'); } }catch(e){}
+
+  // imagens do site (definidas pela Direção)
+  try{
+    const imgs=await api.siteImagens(); const um=l=>imgs.find(x=>x.local===l);
+    const d=um('destaque'); if(d){ const hv=$('#heroVisual'); hv.classList.add('com-foto'); hv.insertAdjacentHTML('afterbegin',`<figure class="foto-hero" style="margin:0"><img src="${esc(d.url)}" alt="${esc(d.titulo||'Crianças no CEI Perseverança')}"></figure>`); }
+    const so=um('sobre'); if(so){ const el=$('#sobreImg'); el.classList.add('com-foto'); el.removeAttribute('aria-hidden'); el.innerHTML=`<img src="${esc(so.url)}" alt="${esc(so.titulo||'CEI Perseverança')}">`; }
+    const gal=imgs.filter(x=>x.local==='galeria').sort((a,b)=>a.ordem-b.ordem);
+    if(gal.length){ $('#galeriaGrid').innerHTML=gal.map(g=>`<div class="ph" data-sfx-hover><img src="${esc(g.url)}" alt="${esc(g.titulo||'Foto do CEI')}" loading="lazy">${g.titulo?`<span>${esc(g.titulo)}</span>`:''}</div>`).join(''); }
+  }catch(e){}
 
   // trilha das turmas
   const DESC={1:'Os primeiros meses com muito colo, rotina tranquila e estímulos para os sentidos.',2:'Primeiros passos e primeiras palavras, explorando o mundo com segurança.',3:'Tempo de descobertas: cores, sons, histórias e muita brincadeira com os amigos.',4:'Pré-escola: linguagem, números e autonomia ganhando espaço no dia a dia.',5:'Preparação para o Ensino Fundamental, com curiosidade e confiança.'};
