@@ -16,10 +16,6 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 /* barra de progresso: um cipó que cresce com a rolagem */
 .vine{position:fixed;left:0;top:env(safe-area-inset-top,0px);height:5px;width:100%;z-index:70;transform-origin:left;transform:scaleX(var(--p,0));background:linear-gradient(90deg,var(--leaf),var(--sun),var(--coral));border-radius:0 6px 6px 0}
 
-.top{background:var(--leaf-deep);color:#fff;font-size:13.5px}
-.top .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;padding-block:7px}
-.top a{color:#fff;font-weight:800;text-decoration:none}
-.top a:hover{text-decoration:underline}
 header.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 header.nav .wrap{display:flex;align-items:center;gap:10px;padding-block:10px}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);margin-right:auto}
@@ -260,13 +256,6 @@ footer .bottom{grid-column:1/-1;border-top:1px solid rgba(255,255,255,.18);paddi
 </head>
 <body>
 <div class="vine" id="vine" aria-hidden="true"></div>
-<div class="top">
-  <div class="wrap">
-    <span>R. José Antônio Temporão, 169 · Paranaguá – PR · Seg a sex, 8h–12h e 13h–17h</span>
-    <span><b>(41) 3425-5968</b> · <a href="https://api.whatsapp.com/send?phone=554134255968" target="_blank" rel="noopener">WhatsApp</a> · <a href="https://www.instagram.com/ceiperseveranca/" target="_blank" rel="noopener">Instagram</a></span>
-  </div>
-</div>
-
 <header class="nav">
   <div class="wrap">
     <a class="logo" href="#inicio"><img src="assets/logo-cei.png" alt="Emblema do CEI Perseverança" width="50" height="50"><span><b>CEI Perseverança</b><small>50 anos em Paranaguá</small></span></a>
