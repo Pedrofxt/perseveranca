@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Área do Responsável · CEI Perseverança</title>
-<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&family=Patrick+Hand&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Montserrat:wght@400;500;600;700;800&family=Montserrat+Alternates:wght@500;600&family=Gloria+Hallelujah&display=swap">
 <link rel="stylesheet" href="assets/pv.css">
 <style>
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -51,14 +51,14 @@
 <div id="demoBar" class="demo-bar" hidden>Modo demonstração: dados de exemplo. No site publicado, tudo fica salvo no Supabase.</div>
 
 <div id="telaCarregando" style="min-height:100vh;display:grid;place-items:center;align-content:center;gap:14px;text-align:center">
-  <img src="assets/logo.svg" alt="" style="width:110px;margin:auto;animation:float 2s ease-in-out infinite">
+  <img src="assets/logo-cei.png" alt="" style="width:110px;margin:auto;animation:float 2s ease-in-out infinite">
   <p class="muted" style="font-weight:800">Carregando…</p>
 </div>
 
 <section class="auth" id="telaLogin" hidden>
   <div class="auth-art" style="background:var(--coral)">
     <a href="index.html" style="color:#fff;font-weight:800;text-decoration:none">← Voltar ao site</a>
-    <img class="crest" src="assets/logo.svg" alt="Emblema do CEI Perseverança">
+    <img class="crest" src="assets/logo-cei.png" alt="Emblema do CEI Perseverança">
     <div style="display:grid;gap:12px;padding-bottom:40px">
       <span class="label">Área do Responsável</span>
       <h1>O dia do seu filho, pertinho de você</h1>
@@ -92,13 +92,13 @@
 </section>
 
 <section class="auth" id="telaSenha" hidden>
-  <div class="auth-art" style="background:var(--coral)"><img class="crest" src="assets/logo.svg" alt=""><h1>Crie uma nova senha</h1><span class="wave" aria-hidden="true"></span></div>
+  <div class="auth-art" style="background:var(--coral)"><img class="crest" src="assets/logo-cei.png" alt=""><h1>Crie uma nova senha</h1><span class="wave" aria-hidden="true"></span></div>
   <div class="auth-form"><form id="fSenha"><h2>Nova senha</h2><label class="field" for="nSenha">Nova senha<input id="nSenha" type="password" minlength="6" autocomplete="new-password" required></label><div id="nMsg"></div><button class="btn btn-leaf" type="submit">Salvar senha</button></form></div>
 </section>
 
 <div class="app" id="telaApp" hidden>
   <aside class="side" id="side">
-    <a class="brand" href="index.html"><img src="assets/logo.svg" alt=""><span><b>CEI Perseverança</b><small>Área do Responsável</small></span></a>
+    <a class="brand" href="index.html"><img src="assets/logo-cei.png" alt=""><span><b>CEI Perseverança</b><small>Área do Responsável</small></span></a>
     <nav id="nav">
       <button data-v="inicio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-7 9 7v11H3z"/></svg>Início</button>
       <button data-v="diario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4z"/><path d="M8 9h8M8 13h6"/></svg>Diário<span class="badge" id="bDiario" hidden></span></button>
@@ -128,7 +128,7 @@
   if(querMatricula) $('#avisoMatricula').hidden=false;
   let modo='entrar', perfil=null, ultimo=null, filhos=[], pedidos=[], filhoSel=null;
   const main=$('#main');
-  const CORF=['#FF6B4A','#3BA7E0','#1F8A5B','#8E5BD6','#D69A00'];
+  const CORF=['#F16C6C','#6C63A8','#3F3A64','#CC3366','#A82B55'];
   const corDe=n=>CORF[[...String(n)].reduce((a,c)=>a+c.charCodeAt(0),0)%CORF.length];
   const EMO={alimentacao:{'Comeu tudo':'😋','Comeu bem':'🙂','Comeu pouco':'😐','Não quis comer':'🙅'},sono:{'Dormiu bem':'😴','Dormiu pouco':'🥱','Não dormiu':'👀'},humor:{'Muito feliz':'😄','Tranquilo(a)':'😊','Sonolento(a)':'😪','Choroso(a)':'😢','Agitado(a)':'🤸'}};
 

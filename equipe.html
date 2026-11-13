@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Área da Equipe · CEI Perseverança</title>
-<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&family=Patrick+Hand&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Montserrat:wght@400;500;600;700;800&family=Montserrat+Alternates:wght@500;600&family=Gloria+Hallelujah&display=swap">
 <link rel="stylesheet" href="assets/pv.css">
 <style>
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -20,7 +20,7 @@
 .punch{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .punch button{border:2px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;border-radius:20px;padding:16px 10px;font:800 15px/1.2 var(--f-body);cursor:pointer;display:grid;gap:6px;justify-items:center;transition:transform .2s cubic-bezier(.3,1.6,.5,1),background .2s}
 .punch button:hover{transform:translateY(-3px);background:rgba(255,255,255,.16)}
-.punch button.next{background:var(--sun);color:#3A2A00;border-color:var(--sun);animation:pulse 2s ease-in-out infinite}
+.punch button.next{background:var(--sun);color:#FFFFFF;border-color:var(--sun);animation:pulse 2s ease-in-out infinite}
 .punch button.done{opacity:.55}
 .punch button svg{width:24px;height:24px}
 @media (max-width:700px){.punch{grid-template-columns:1fr 1fr}}
@@ -60,14 +60,14 @@
 <div id="demoBar" class="demo-bar" hidden>Modo demonstração: dados de exemplo. No site publicado, o login usa o Supabase.</div>
 
 <div id="telaCarregando" style="min-height:100vh;display:grid;place-items:center;align-content:center;gap:14px;text-align:center">
-  <img src="assets/logo.svg" alt="" style="width:110px;margin:auto;animation:float 2s ease-in-out infinite">
+  <img src="assets/logo-cei.png" alt="" style="width:110px;margin:auto;animation:float 2s ease-in-out infinite">
   <p class="muted" style="font-weight:800">Carregando…</p>
 </div>
 
 <section class="auth" id="telaLogin" hidden>
   <div class="auth-art" style="background:var(--leaf-deep)">
     <a href="index.html" style="color:#fff;font-weight:800;text-decoration:none">← Voltar ao site</a>
-    <img class="crest" src="assets/logo.svg" alt="Emblema do CEI Perseverança">
+    <img class="crest" src="assets/logo-cei.png" alt="Emblema do CEI Perseverança">
     <div style="display:grid;gap:12px;padding-bottom:40px">
       <span class="label">Acesso restrito à equipe</span>
       <h1>Direção, secretaria, professores e funcionários</h1>
@@ -103,13 +103,13 @@
 </section>
 
 <section class="auth" id="telaSenha" hidden>
-  <div class="auth-art" style="background:var(--leaf-deep)"><img class="crest" src="assets/logo.svg" alt=""><h1>Crie uma nova senha</h1><span class="wave" aria-hidden="true"></span></div>
+  <div class="auth-art" style="background:var(--leaf-deep)"><img class="crest" src="assets/logo-cei.png" alt=""><h1>Crie uma nova senha</h1><span class="wave" aria-hidden="true"></span></div>
   <div class="auth-form"><form id="fSenha"><h2>Nova senha</h2><label class="field" for="nSenha">Nova senha<input id="nSenha" type="password" minlength="6" autocomplete="new-password" required></label><div id="nMsg"></div><button class="btn btn-leaf" type="submit">Salvar senha</button></form></div>
 </section>
 
 <div class="app" id="telaApp" hidden>
   <aside class="side" id="side">
-    <a class="brand" href="index.html"><img src="assets/logo.svg" alt=""><span><b>CEI Perseverança</b><small>Área da Equipe</small></span></a>
+    <a class="brand" href="index.html"><img src="assets/logo-cei.png" alt=""><span><b>CEI Perseverança</b><small>Área da Equipe</small></span></a>
     <nav id="nav"></nav>
     <div class="who"><div style="display:flex;gap:10px;align-items:center"><span id="whoAv"></span><b id="whoNome" style="min-width:0;overflow-wrap:anywhere"></b></div><span class="pill sun" id="whoPapel" style="justify-self:start"></span><button class="btn btn-ghost btn-sm" id="sair" style="color:#fff;justify-self:start">Sair</button></div>
   </aside>
@@ -132,7 +132,7 @@
   const main=$('#main');
   const EQUIPE=PV.EQUIPE, SALA=['professor','secretario','diretor'], GESTAO=['secretario','diretor'], DIR=['diretor'];
   const pode=r=>perfil&&r.includes(perfil.papel);
-  const CORF=['#FF6B4A','#3BA7E0','#1F8A5B','#8E5BD6','#D69A00'];
+  const CORF=['#F16C6C','#6C63A8','#3F3A64','#CC3366','#A82B55'];
   const corDe=n=>CORF[[...String(n)].reduce((a,c)=>a+c.charCodeAt(0),0)%CORF.length];
 
   const ICON={casa:'<path d="M3 10l9-7 9 7v11H3z"/>',relogio:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',diario:'<path d="M4 4h12a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4z"/><path d="M8 9h8M8 13h6"/>',cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 15l2 2 4-4"/>',mat:'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M9 15l2 2 4-4"/>',kids:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2A5 5 0 0 1 21.5 19"/>',turmas:'<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',mega:'<path d="M3 11l15-6v14L3 13z"/><path d="M7 13v5"/>',agenda:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',msg:'<path d="M4 5h16v11H8l-4 4z"/>',chave:'<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3"/>',escudo:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',rel:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'};

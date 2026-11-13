@@ -66,7 +66,7 @@
   function explosao(x, y) {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const b = document.createElement("span"); b.className = "burst"; b.style.left = x + "px"; b.style.top = y + "px";
-    const cores = ["#FFC233", "#FF6B4A", "#3BA7E0", "#1F8A5B", "#8E5BD6"];
+    const cores = ["#CC3366", "#F16C6C", "#6C63A8", "#3F3A64", "#CC3366"];
     for (let i = 0; i < 9; i++) { const a = i / 9 * Math.PI * 2, d = 26 + Math.random() * 22, s = document.createElement("i"); s.style.background = cores[i % cores.length]; s.style.setProperty("--x", Math.cos(a) * d + "px"); s.style.setProperty("--y", Math.sin(a) * d + "px"); b.appendChild(s); }
     document.body.appendChild(b); setTimeout(() => b.remove(), 650);
   }
@@ -339,16 +339,16 @@
 
   /* ================= avatares ================= */
   const AVATARES = {
-    sol: ["#FFC233", '<circle cx="12" cy="12" r="4.5" fill="#fff" stroke="none"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/>'],
-    folha: ["#1F8A5B", '<path fill="#fff" stroke="none" d="M5 19C4 10 10 4 20 4c0 10-6 16-15 15z"/><path stroke="#1F8A5B" d="M6 18c4-5 8-8 11-10"/>'],
-    peixe: ["#3BA7E0", '<path fill="#fff" stroke="none" d="M3 12c3-4 8-6 12-4l5-3v14l-5-3c-4 2-9 0-12-4z"/><circle cx="8" cy="11" r="1.1" fill="#3BA7E0" stroke="none"/>'],
-    estrela: ["#FF6B4A", '<path fill="#fff" stroke="none" d="M12 2.5l2.8 6.2 6.7.6-5.1 4.5 1.5 6.6L12 17l-5.9 3.4 1.5-6.6L2.5 9.3l6.7-.6z"/>'],
-    coracao: ["#8E5BD6", '<path fill="#fff" stroke="none" d="M12 20.5s-8-4.7-8-10.6A4.4 4.4 0 0 1 12 7.4a4.4 4.4 0 0 1 8 2.5c0 5.9-8 10.6-8 10.6z"/>'],
-    barco: ["#0F5C3C", '<path fill="#fff" stroke="none" d="M11 3v11H4z M13 6l6 8h-6z"/><path d="M3 17h18l-2 3H5z" fill="#fff"/>'],
-    flor: ["#FF6B4A", '<g fill="#fff" stroke="none"><circle cx="12" cy="6.5" r="3.2"/><circle cx="17.2" cy="10.3" r="3.2"/><circle cx="15.2" cy="16.5" r="3.2"/><circle cx="8.8" cy="16.5" r="3.2"/><circle cx="6.8" cy="10.3" r="3.2"/></g><circle cx="12" cy="11.8" r="2.6" fill="#FFC233" stroke="none"/>'],
-    lapis: ["#3BA7E0", '<path d="M4 20l1.2-4.8L15.5 4.9a2 2 0 0 1 2.8 0l.8.8a2 2 0 0 1 0 2.8L8.8 18.8z"/><path d="M13.5 7l3.5 3.5"/>']
+    sol: ["#CC3366", '<circle cx="12" cy="12" r="4.5" fill="#fff" stroke="none"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/>'],
+    folha: ["#3F3A64", '<path fill="#fff" stroke="none" d="M5 19C4 10 10 4 20 4c0 10-6 16-15 15z"/><path stroke="#3F3A64" d="M6 18c4-5 8-8 11-10"/>'],
+    peixe: ["#6C63A8", '<path fill="#fff" stroke="none" d="M3 12c3-4 8-6 12-4l5-3v14l-5-3c-4 2-9 0-12-4z"/><circle cx="8" cy="11" r="1.1" fill="#6C63A8" stroke="none"/>'],
+    estrela: ["#F16C6C", '<path fill="#fff" stroke="none" d="M12 2.5l2.8 6.2 6.7.6-5.1 4.5 1.5 6.6L12 17l-5.9 3.4 1.5-6.6L2.5 9.3l6.7-.6z"/>'],
+    coracao: ["#CC3366", '<path fill="#fff" stroke="none" d="M12 20.5s-8-4.7-8-10.6A4.4 4.4 0 0 1 12 7.4a4.4 4.4 0 0 1 8 2.5c0 5.9-8 10.6-8 10.6z"/>'],
+    barco: ["#2B2748", '<path fill="#fff" stroke="none" d="M11 3v11H4z M13 6l6 8h-6z"/><path d="M3 17h18l-2 3H5z" fill="#fff"/>'],
+    flor: ["#F16C6C", '<g fill="#fff" stroke="none"><circle cx="12" cy="6.5" r="3.2"/><circle cx="17.2" cy="10.3" r="3.2"/><circle cx="15.2" cy="16.5" r="3.2"/><circle cx="8.8" cy="16.5" r="3.2"/><circle cx="6.8" cy="10.3" r="3.2"/></g><circle cx="12" cy="11.8" r="2.6" fill="#CC3366" stroke="none"/>'],
+    lapis: ["#6C63A8", '<path d="M4 20l1.2-4.8L15.5 4.9a2 2 0 0 1 2.8 0l.8.8a2 2 0 0 1 0 2.8L8.8 18.8z"/><path d="M13.5 7l3.5 3.5"/>']
   };
-  const CORES = ["#1F8A5B", "#3BA7E0", "#FF6B4A", "#8E5BD6", "#D69A00"];
+  const CORES = ["#3F3A64", "#6C63A8", "#F16C6C", "#CC3366", "#A82B55"];
   function iniciais(n) { const p = String(n || "?").replace(/[^\p{L}\s]/gu, " ").trim().split(/\s+/).filter(w => !/^(exemplo|de|da|do|dos|das|e)$/i.test(w)); if (!p.length) p.push("?"); return ((p[0] || "?")[0] + (p.length > 1 ? p[p.length - 1][0] : "")).toUpperCase(); }
   function avatar(perfil, tam) {
     tam = tam || 40; const u = perfil && perfil.avatar_url;
